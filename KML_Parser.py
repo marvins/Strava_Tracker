@@ -841,7 +841,6 @@ class Bike_Sector_KML_File:
                
                 #  Parse Folder
                 folder = KML_Folder.From_KML( subnode )
-                print(folder.Get_KML_Content())
                 
                 #  For each placemark, grab the polygon
                 features = folder.features
@@ -850,9 +849,10 @@ class Bike_Sector_KML_File:
                     polygon = []
                     for point in feature.geometry.innerPoints:
                         polygon.append([point.lon, point.lat, point.elev])
-                    polygons.append( polygon )
+                    polygons.append( { 'name'   : feature.name,
+                                       'polygon': polygon } )
                     
-        print('Polygons: {}'.format(polygons))
+        return polygons
                 
                 
                 
