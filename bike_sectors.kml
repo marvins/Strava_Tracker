@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Folder id="972ee36e-556b-4277-aac9-9c30b9f347f3">
+    <open>1</open>
+    <visibility>1</visibility>
+    <name>Bike Sectors</name>
+    <Style>
+      <ListStyle>
+        <listItemType>check</listItemType>
+      </ListStyle>
+    </Style>
+    <Placemark id="692b32a4-5346-41ab-bc58-9c19105cd608">
+      <visibility>1</visibility>
+      <name>Sector 1</name>
+      <Style>
+        <LineStyle>
+          <color>ff5454ff</color>
+          <width>2</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff5454ff</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.8596317939417,39.59964052446061,1727.55555997882 -104.8656085561702,39.59952698806418,1743.530713628978 -104.8658204327421,39.62429864622491,1713.85284910351 
+              -104.8694938139581,39.62421627256241,1721.080240177922 -104.8689203362657,39.59708727448692,1752.939279578626 -104.859217157812,39.59701703508912,1724.272305747494 
+              -104.8596317939417,39.59964052446061,1727.55555997882
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="3cb3482d-5ef9-4ac8-9df2-6340462b523a">
+      <visibility>1</visibility>
+      <name>Sector 2</name>
+      <Style>
+        <LineStyle>
+          <color>ff00fcff</color>
+          <width>2</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff00fcff</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.8658059169897,39.62430627231349,1714.044135181233 -104.8657462514146,39.62871531879424,1708.574501409195 -104.8739737605459,39.62879469668843,1713.131421362981 
+              -104.8735271784212,39.63307043304464,1714.704390282743 -104.8749046311363,39.63428222818924,1712.761129417457 -104.8719826757846,39.64128784560045,1699.736051759683 
+              -104.8674521038727,39.64395469059895,1697.392627329566 -104.8718865571569,39.64682070108329,1685.894021930173 -104.8792057836831,39.64117120445887,1703.704257042147 
+              -104.881486400503,39.63266571182536,1727.068568753079 -104.8795747364876,39.62835435966871,1723.58558531478 -104.8782336589944,39.6252682540171,1725.428917580284 
+              -104.8694995737152,39.62422099715439,1721.435485290363 -104.8658059169897,39.62430627231349,1714.044135181233
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="fdfbe72d-4dc1-4475-bd72-0a531fa835c5">
+      <visibility>1</visibility>
+      <name>Sector 3</name>
+      <Style>
+        <LineStyle>
+          <color>ff669900</color>
+          <width>2</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff669900</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.8674337676766,39.64395608075984,1692.966799858958 -104.8718910339858,39.64683402554435,1685.97069756873 -104.8589215007661,39.65221362496013,1679.393324759789 
+              -104.8637327845905,39.65777351007485,1673.061031137593 -104.8619463022605,39.65858271540446,1680.841734080575 -104.8593869286344,39.65737575411886,1688.515768387355 
+              -104.8575349619028,39.65738838205985,1690.792703830637 -104.8565702341312,39.65519160794302,1692.464752390049 -104.8557888489048,39.65424269700157,1690.26972739026 
+              -104.8538052059881,39.65483409257696,1694.842617738992 -104.8527405918695,39.65367070315173,1698.732112815604 -104.8530412755817,39.65225326561136,1719.838275309652 
+              -104.8674337676766,39.64395608075984,1692.966799858958
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="f69aef97-33d2-4c52-8802-88aeb5750424">
+      <visibility>1</visibility>
+      <name>Sector 4</name>
+      <Style>
+        <LineStyle>
+          <color>ff3300ff</color>
+          <width>3</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff3300ff</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.8637199708152,39.65775877303997,1672.776460271329 -104.8619037795384,39.65853630039479,1682.060003681108 -104.8652626774775,39.6634515236936,1680.712882688269 
+              -104.8793430571699,39.66636236173473,1663.29654512275 -104.8929775694308,39.67479671065473,1657.110118563287 -104.8945863934344,39.67481312622538,1656.945821465924 
+              -104.8944355180929,39.67389359417953,1656.878187218681 -104.8935468667107,39.67254112651795,1658.70832686685 -104.8921551835686,39.66919492301253,1663.56632279139 
+              -104.8791099720854,39.66178458296059,1667.967730288394 -104.8637199708152,39.65775877303997,1672.776460271329
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="0a5074fc-3af9-4a7b-9a2b-70d190da0999">
+      <visibility>1</visibility>
+      <name>Sector 5</name>
+      <Style>
+        <LineStyle>
+          <color>ff669900</color>
+          <width>3</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff669900</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.8945772895033,39.67477891783957,1656.285863239318 -104.8929194298527,39.67475608590163,1656.929825355299 -104.896977304345,39.68195389055666,1651.592118341476 
+              -104.904299980407,39.68740348358114,1649.287184741348 -104.921234536425,39.69719143284461,1639.351655029692 -104.9248803642585,39.69585807827843,1639.754894336686 
+              -104.9042026891978,39.68322797180844,1650.740698984824 -104.8945772895033,39.67477891783957,1656.285863239318
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="429bf2ec-7e44-4a2a-a76f-339fda3eeed5">
+      <visibility>1</visibility>
+      <name>Sector 6</name>
+      <Style>
+        <LineStyle>
+          <color>ff990000</color>
+          <width>3</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff990000</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.924872148242,39.6958431926961,1638.842288256623 -104.9211881201476,39.69717408329458,1639.397684504278 -104.9245802279926,39.70046842887151,1636.501050905325 
+              -104.9285741095404,39.70387416694054,1634.271309012547 -104.9377711608879,39.70762918300535,1629.501679998823 -104.9435692363979,39.71003982737011,1627.230352271348 
+              -104.9505643099332,39.71548407742425,1618.816245490685 -104.9580105364162,39.71703994682355,1618.209528882056 -104.9600512563995,39.71480606440535,1615.632716055959 
+              -104.9538301678828,39.71316655156332,1621.190528114326 -104.9435227423814,39.70537287985489,1627.722339427099 -104.9322438081233,39.70134402039525,1632.927497197874 
+              -104.928017787898,39.69930458109935,1636.004557166249 -104.924872148242,39.6958431926961,1638.842288256623
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="417287c9-4862-4e00-9df8-12a7fc126dff">
+      <visibility>1</visibility>
+      <name>Sector 7</name>
+      <Style>
+        <LineStyle>
+          <color>ff0099ff</color>
+          <width>3</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff0099ff</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.9578991388593,39.71701351089288,1618.001159508713 -104.9599529865583,39.71477135928259,1615.597687051632 -104.9618365104979,39.71726237858478,1614.323542600498 
+              -104.9726836457675,39.71723888252006,1608.745094892569 -104.9806628012387,39.72026692027082,1605.886409245431 -104.9785847012034,39.72225774561699,1604.08990200609 
+              -104.9731283611987,39.71988139534991,1608.646382063627 -104.9638985563183,39.71957835378291,1612.163984760642 -104.9578300914128,39.71970841175155,1617.142369512469 
+              -104.9578991388593,39.71701351089288,1618.001159508713
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="5ba509de-572f-46c9-a7f3-493ff1199a49">
+      <visibility>1</visibility>
+      <name>Sector 8</name>
+      <Style>
+        <LineStyle>
+          <color>ff808080</color>
+          <width>3</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ff808080</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -104.9806289372482,39.72023578960385,1605.461076132953 -104.9785203680969,39.72226000054562,1604.928955078125 -104.9829033247356,39.7245261481813,1601.448568345048 
+              -104.9869139000182,39.7281616473087,1600.830199780874 -104.9924234729912,39.73437674689958,1594.654647001065 -104.9976171032973,39.74010790433722,1589.834790986963 
+              -105.000256538774,39.74013004878331,1590.068964396603 -104.9949279480251,39.73308057729827,1595.766177656129 -104.9908844170124,39.72748411062328,1598.546769432724 
+              -104.9844767568638,39.72242688082365,1605.326088834554 -104.9806289372482,39.72023578960385,1605.461076132953
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark id="79b95912-b05b-4264-9006-f6b8b447d274">
+      <visibility>1</visibility>
+      <name>Sector 9</name>
+      <Style>
+        <LineStyle>
+          <color>ffffcc00</color>
+          <width>3</width>
+        </LineStyle>
+        <PolyStyle>
+          <color>ffffcc00</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+      </Style>
+      <Polygon>
+        <altitudeMode>clampToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -105.0002173070099,39.74007131418741,1589.926521527581 -104.9975234801447,39.74004759176577,1590.02141751349 -104.991351686684,39.7570419250982,1586.603963519447 
+              -105.0131371915907,39.75891179687876,1605.481626951136 -105.0024072934671,39.74150109004913,1588.729996954091 -105.0002173070099,39.74007131418741,1589.926521527581
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Folder>
+</kml>
