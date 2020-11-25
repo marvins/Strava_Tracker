@@ -648,8 +648,7 @@ class KML_Placemark(KML_Feature):
                 isOpen = int(subnode.text)
                 
             elif 'Polygon' in subnode.tag:
-                geometry = KML_Polygon.From_KML( subnode )
-                
+                geometry = KML_Polygon.From_KML( subnode )                
             
         new_placemark = KML_Placemark( id, 
                                        name,
@@ -849,8 +848,8 @@ class Bike_Sector_KML_File:
                     polygon = []
                     for point in feature.geometry.innerPoints:
                         polygon.append([point.lon, point.lat, point.elev])
-                    polygons.append( { 'name'   : feature.name,
-                                       'polygon': polygon } )
+                    polygons.append( { 'name'      : feature.name,
+                                       'polygon'   : polygon } )
                     
         return polygons
                 

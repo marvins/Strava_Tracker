@@ -18,7 +18,7 @@
           <width>2</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff5454ff</color>
+          <color>4c5454ff</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -45,7 +45,7 @@
           <width>2</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff00fcff</color>
+          <color>4c00fcff</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -74,7 +74,7 @@
           <width>2</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff669900</color>
+          <color>4c669900</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -99,11 +99,11 @@
       <name>Sector 4</name>
       <Style>
         <LineStyle>
-          <color>ff3300ff</color>
+          <color>ff660066</color>
           <width>3</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff3300ff</color>
+          <color>4c660066</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -127,11 +127,11 @@
       <name>Sector 5</name>
       <Style>
         <LineStyle>
-          <color>ff669900</color>
+          <color>ff00ff99</color>
           <width>3</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff669900</color>
+          <color>4c00ff99</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -158,7 +158,7 @@
           <width>3</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff990000</color>
+          <color>4c990000</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -187,7 +187,7 @@
           <width>3</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff0099ff</color>
+          <color>4c0099ff</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -215,7 +215,7 @@
           <width>3</width>
         </LineStyle>
         <PolyStyle>
-          <color>ff808080</color>
+          <color>4c808080</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>
@@ -243,7 +243,7 @@
           <width>3</width>
         </LineStyle>
         <PolyStyle>
-          <color>ffffcc00</color>
+          <color>4cffcc00</color>
           <fill>1</fill>
           <outline>1</outline>
         </PolyStyle>

@@ -2,12 +2,24 @@
 
 ## Setup
 
-    sudo pip3 install ipywidgets shapely sqlalchemy ipyleaflet
+Distribution Packages
+
+    sudo apt install npm
+
+PIP Packages
+
+    pip3 install ipywidgets shapely sqlalchemy ipyleaflet gpxpy pandas
     jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
-    sudo jupyter nbextension enable --py widgetsnbextension
+    jupyter nbextension enable --py widgetsnbextension
     
-### Recommended Tools
+## Recommended Tools
 
     sudo apt install sqlitebrowser
     
+## Starting Project
+
+    jupyter-lab .
+
+or 
     
+    jupyter-notebook .
