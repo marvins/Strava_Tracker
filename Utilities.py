@@ -62,3 +62,15 @@ def Distance_Vincenty( coord1, coord2, maxIter=200, tol=10**-12 ):
         #self.inches=self.feet*12                    # output distance in inches
         #self.yards=self.feet/3                      # output distance in yards
         return m
+    
+def Distance_GreatCircle( coord1, coord2 ):
+    lon1, lat1, lon2, lat2 = map(math.radians, [coord1[1], coord1[0], coord2[1], coord2[0]])
+    
+    return 6371009.0 * ( math.acos(math.sin(lat1) * math.sin(lat2) + math.cos(lat1) * math.cos(lat2) * math.cos(lon1 - lon2)))
+
+def Distance_Haversine( coord1, coord2 ):
+    lon1, lat1, lon2, lat2 = map(math.radians, [coord1[1], coord1[0], coord2[1], coord2[0]])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    return 2 * 6371009.0 * math.asin(math.sqrt(a))
