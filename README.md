@@ -8,7 +8,7 @@ Distribution Packages
 
 PIP Packages
 
-    pip3 install ipywidgets shapely sqlalchemy ipyleaflet gpxpy pandas matplotlib geopy
+    pip3 install ipywidgets shapely sqlalchemy ipyleaflet gpxpy pandas matplotlib pyproj
     jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
     jupyter nbextension enable --py widgetsnbextension
     
