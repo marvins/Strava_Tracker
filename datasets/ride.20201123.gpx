@@ -7,26 +7,6 @@
   <name>Afternoon Ride</name>
   <type>1</type>
   <trkseg>
-   <trkpt lat="39.5989610" lon="-104.8608580">
-    <ele>1731.3</ele>
-    <time>2020-11-23T23:17:27Z</time>
-   </trkpt>
-   <trkpt lat="39.5989360" lon="-104.8609090">
-    <ele>1731.2</ele>
-    <time>2020-11-23T23:17:28Z</time>
-   </trkpt>
-   <trkpt lat="39.5989210" lon="-104.8609410">
-    <ele>1731.2</ele>
-    <time>2020-11-23T23:17:29Z</time>
-   </trkpt>
-   <trkpt lat="39.5989350" lon="-104.8609190">
-    <ele>1731.2</ele>
-    <time>2020-11-23T23:17:30Z</time>
-   </trkpt>
-   <trkpt lat="39.5989400" lon="-104.8609020">
-    <ele>1731.2</ele>
-    <time>2020-11-23T23:17:31Z</time>
-   </trkpt>
    <trkpt lat="39.5989450" lon="-104.8608850">
     <ele>1731.2</ele>
     <time>2020-11-23T23:17:32Z</time>
