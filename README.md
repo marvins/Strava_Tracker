@@ -31,13 +31,15 @@ or
     
 ## Building Datasets
 
-### Step 1:  Copy datasets 
+### Step 0:  Copy datasets 
 
     Make sure to download all desired datasets from Strava and copy to `./datasets/` sub-directory.
     
-### Step 2:  Parse GPX data and construct database
+### Step 1:  Parse GPX data and construct database
 
     Run the `gpx_parsing.ipynb` notebook.  
     
-### Step 3:  Build route/dataset database tables
+### Step 2:  Build average route
+
+
 
