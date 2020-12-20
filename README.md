@@ -20,6 +20,12 @@ For Plotly Packages
 ## Recommended Tools
 
     sudo apt install sqlitebrowser
+
+##  C++ Module
+    
+    git submodule add git@github.com:google/googletest.git
+    git submodule init
+    git submodule update
     
 ## Starting Project
 
