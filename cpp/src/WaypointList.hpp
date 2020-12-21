@@ -27,6 +27,9 @@ class WaypointList
         /// Mutation Function Type
         typedef std::function<void(WaypointList&)> mutation_func_tp;
 
+        /// Randomization Function Type
+        typedef std::function<void(WaypointList&)> random_func_tp;
+
         /**
          * @brief Build a new Phenotype from the string
          */
@@ -39,6 +42,12 @@ class WaypointList
          * @brief Get the Fitness Score
          */
         double Get_Fitness() const;
+
+        /**
+         * @brief Set the Fitness
+         * @note Only use for testing.
+         */
+        void Set_Fitness( double fitness );
 
         /**
          * @brief Compute a new fitness score
@@ -61,11 +70,16 @@ class WaypointList
         bool operator < ( const WaypointList& rhs ) const;
 
         /**
+         * @brief Equivalent Operator
+         */
+        bool operator == ( const WaypointList& rhs ) const;
+
+        /**
          * @brief Create a random waypoint list
          */
         static WaypointList Create_Random( size_t number_points,
-                                           size_t x_digits,
-                                           size_t y_digits );
+                                           size_t max_x,
+                                           size_t max_y );
 
         /**
          * @brief Perform Crossover on Waypoint List
@@ -81,6 +95,11 @@ class WaypointList
          */
         static void Mutation( WaypointList& wp );
 
+        /**
+         * @brief Perform Randomization on a Waypoint
+         */
+        static void Randomize( WaypointList& wp );
+
     private:
 
         // The actual phenotype the GA will use
@@ -93,6 +112,8 @@ class WaypointList
         size_t m_number_points;
 
         /// Precision
+        size_t m_max_x;
+        size_t m_max_y;
         size_t m_x_digits;
         size_t m_y_digits;
 
@@ -102,13 +123,13 @@ class WaypointList
  * @brief Build a random population
  * @param population_size 
  * @param number_points Number of points in the waypoint list
- * @param x_digits Number of digits needed for easting
- * @param y_digits Number of digits needed for northing
+ * @param max_x Max distance needed for easting
+ * @param max_y Max distance needed for northing
  */
 std::vector<WaypointList> Build_Random_Waypoints( size_t population_size,
                                                   size_t number_points,
-                                                  size_t x_digits,
-                                                  size_t y_digits );
+                                                  size_t max_x,
+                                                  size_t max_y );
 
 /**
  * @brief Logging-friendly way to print the population list

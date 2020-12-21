@@ -31,6 +31,7 @@ bool Exit_Condition::Check_Exit( double fitness )
     if( std::fabs(fitness - m_current_fitness) < m_eps )
     {
         m_counter++;
+        BOOST_LOG_TRIVIAL(debug) << "No improvement in " << m_counter << " iterations";
         if( m_counter >= m_max_matches )
         {
             BOOST_LOG_TRIVIAL(info) << "Reached max fitness match count. Exiting.";

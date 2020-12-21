@@ -127,32 +127,28 @@ template <typename TP>
 double Point_Line_Distance( const Point<TP>& p, const Point<TP>& l1, const Point<TP>& l2 )
 {
     // Build lines
-    auto v_21 = l1 - l2;
+    auto v_21 = l2 - l1;
     auto v_p2 = p - l2;
     auto v_p1 = p - l1;
 
+    int64_t p_1 = std::round( v_21.x() * v_p2.x() + v_21.y() * v_p2.y());
+    int64_t p_2 = std::round( v_21.x() * v_p1.x() + v_21.y() * v_p1.y());
+
+    if( p_1 > 0 )
+    {
+        return Point<TP>::Distance_L2( p, l2 );
+    }
+    if( p_2 < 0 )
+    {
+        return Point<TP>::Distance_L2( p, l1 );
+    }
     // If the 2 line segment points are the same, just do distance
     if( v_21.Magnitude() < 0.01 )
     {
         return Point<TP>::Distance_L2( p, l1 );
     }
     
-    // Do some dot products
-    auto d21_p2 = v_21.x() * v_p2.x() + v_21.y() * v_p2.y();
-    auto d21_p1 = v_21.x() * v_p1.x() + v_21.y() * v_p1.y();
-    
-    if( d21_p2 > 0 )
-    {
-        return sqrt( (p.x() - l2.x())*(p.x() - l2.x()) + (p.y() - l2.y())*(p.y() - l2.y()) );
-    }
-    else if( d21_p2 < 0 )
-    {
-        return sqrt( (p.x() - l1.x())*(p.x() - l1.x()) + (p.y() - l1.y())*(p.y() - l1.y()) );
-    }
-    else
-    {
-        return std::fabs( v_21.x() * v_p1.y() - v_21.y() * v_p1.x() ) / sqrt( v_21.x() * v_21.x() + v_21.y() * v_21.y() );
-    }
+    return std::fabs( v_21.x()*v_p1.y() - v_p1.x()*v_21.y()) / v_21.Magnitude();
 }
 
 
@@ -163,18 +159,17 @@ template <typename TP>
 double Find_Best_Segment_Error( const Point<TP>&              ref_point,
                                 const std::vector<Point<TP>>& vertices )
 {
-    double minDist = -1;
+    double minSegmentDist = -1;
 
-    // Iterate over all vertices, finding the nearest distance to a segment
+    // Iterate over all vertices, finding the nearest distance to a segment, then do it for each distance to vertex itself
     for( size_t i=0; i<(vertices.size()-1); i++ )
     {
-        // Compute the distance
+        // Compute the distance to this line segment
         auto dist = Point_Line_Distance( ref_point, vertices[i], vertices[i+1] );
-        if( minDist < 0 || dist < minDist )
+        if( minSegmentDist < 0 || dist < minSegmentDist )
         {
-            minDist = dist;
+            minSegmentDist = dist;
         }
     }
-    
-    return minDist;
+    return minSegmentDist;
 }                                

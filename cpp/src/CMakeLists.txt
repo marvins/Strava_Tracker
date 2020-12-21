@@ -4,6 +4,8 @@
 
 add_executable( route_finder
                 route_finder.cpp
+                Accumulator.hpp
+                Blocking_Queue.hpp
                 DB_Point.hpp
                 DB_Point.cpp
                 DB_Utils.hpp
@@ -16,8 +18,11 @@ add_executable( route_finder
                 GDAL_Utilities.cpp
                 Genetic_Algorithm.hpp
                 Geometry.hpp
+                KML_Writer.hpp
+                KML_Writer.cpp
                 Options.hpp
                 Options.cpp
+                Thread_Pool.hpp
                 WaypointList.hpp
                 WaypointList.cpp )
 

@@ -55,6 +55,10 @@ Options Parse_Command_Line( int argc, char* argv[] )
     // Create Exit Condition
     output.exit_condition = std::make_shared<Exit_Condition>( output.exit_repeats, 0.001 );
 
+    output.ga_config.mutation_rate     = output.mutation_rate;
+    output.ga_config.preservation_rate = output.preservation_rate;
+    output.ga_config.selection_rate    = output.selection_rate;
+
     return output;
 }
 

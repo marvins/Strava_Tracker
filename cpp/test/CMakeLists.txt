@@ -4,7 +4,16 @@
 
 add_executable( route_finder_tests
                 route_finder_test.cpp
-                TEST_Geometry.cpp )
+                TEST_Accumulator.cpp
+                TEST_Geometry.cpp
+                TEST_KML_Writer.cpp
+                TEST_Thread_Pool.cpp
+                ../src/Accumulator.hpp
+                ../src/Blocking_Queue.hpp
+                ../src/Geometry.hpp
+                ../src/KML_Writer.hpp
+                ../src/KML_Writer.cpp
+                ../src/Thread_Pool.hpp )
 
 include_directories( '../googletest/googletest/include' )
 
