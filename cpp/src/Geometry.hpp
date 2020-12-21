@@ -8,6 +8,7 @@
 #include <array>
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -157,9 +158,11 @@ double Point_Line_Distance( const Point<TP>& p, const Point<TP>& l1, const Point
  */
 template <typename TP>
 double Find_Best_Segment_Error( const Point<TP>&              ref_point,
-                                const std::vector<Point<TP>>& vertices )
+                                const std::vector<Point<TP>>& vertices,
+                                std::map<int,int>&            segment_histogram )
 {
     double minSegmentDist = -1;
+    int segmentId = -1;
 
     // Iterate over all vertices, finding the nearest distance to a segment, then do it for each distance to vertex itself
     for( size_t i=0; i<(vertices.size()-1); i++ )
@@ -169,7 +172,9 @@ double Find_Best_Segment_Error( const Point<TP>&              ref_point,
         if( minSegmentDist < 0 || dist < minSegmentDist )
         {
             minSegmentDist = dist;
+            segmentId = i;
         }
     }
+    segment_histogram[segmentId]++;
     return minSegmentDist;
 }                                

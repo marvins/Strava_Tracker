@@ -73,13 +73,15 @@ int main( int argc, char* argv[] )
 
     // /////////////////////////////////////////////
     // /////////////////////////////////////////////
-    // auto wp1 = WaypointList( "14714340940862256040040220767130287", 5, max_x, max_y );
+    //auto wp1 = WaypointList( "02919464928027687076744693316470754581838767204309689183", 8, max_x, max_y );
     // auto wp2 = WaypointList( "40220761471434094086225604007130287", 5, max_x, max_y );
-    // wp1.Update_Fitness( context );
+    //std::cout << "Waypoint 1 (Bad)" << std::endl;
+    //wp1.Update_Fitness( context );
+    // std::cout << "Waypoint 2 (Good)" << std::endl;
     // wp2.Update_Fitness( context );
-    // std::cout << wp1.To_String(true) << std::endl;
+    //std::cout << wp1.To_String(true) << std::endl;
     // std::cout << wp2.To_String(true) << std::endl;
-    // return 0;
+    //return 0;
     // //////////////////////////////////////////////
     // //////////////////////////////////////////////
 

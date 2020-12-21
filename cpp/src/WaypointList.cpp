@@ -13,9 +13,10 @@
 // C++ Libraries
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <sstream>
 
-static double global_min_segment_length = -1;
+static double global_min_segment_length = std::numeric_limits<double>::max();
 
 /********************************/
 /*          Constructor         */
@@ -69,24 +70,37 @@ void WaypointList::Update_Fitness( void* context_info )
 
     // Map each reference point against it's "best-fit" line-segment
     m_fitness = 0;
+    std::map<int,int> segment_histogram;
     for( const auto& point : point_list )
     {
-        m_fitness += Find_Best_Segment_Error( Point( point.x_norm, point.y_norm ), vertices );
+        m_fitness += Find_Best_Segment_Error( Point( point.x_norm, point.y_norm ), 
+                                              vertices,
+                                              segment_histogram );
     }
     // Normalize Fitness
     m_fitness = ( m_fitness * 1000 ) / point_list.size();
 
-    double segment_length = 0;
+    double total_length = 0;
+    //double segment_score_1 = 0;
+    //double segment_score_2 = 0;
+    //double score1, score2;
     for( size_t i=0; i<(vertices.size()-1); i++ )
     {
-        segment_length += Point<double>::Distance_L2( vertices[i], vertices[i+1] );
+        double segment_length = Point<double>::Distance_L2( vertices[i], vertices[i+1] );
+        total_length += segment_length;
+    //    score1 = segment_length / segment_histogram[i];
+    //    score2 = (segment_length*segment_length) / (segment_histogram[i]*segment_histogram[i]);
+    //    //std::cout << "Segment: " << i << ", Length: " << segment_length << ", #Points: " << segment_histogram[i] << ", Score1: " << score1 << ", Score2: " << score2 << std::endl;
+    //    segment_score_1 += score1;
+    //    segment_score_2 += score2;
     }
-    if( global_min_segment_length < 0 || segment_length < global_min_segment_length )
+    if( total_length < global_min_segment_length )
     {
-        global_min_segment_length = segment_length;
+        global_min_segment_length = total_length;
     }
-    m_fitness += 1000 * segment_length / global_min_segment_length; 
-    //std::cout << "Fitness: " << std::fixed << m_fitness << ", Length: " << segment_length << std::endl;
+    m_fitness += 1000 * (total_length / global_min_segment_length);
+    //m_fitness += segment_score_2;
+    //std::cout << "Segment Score 1: " << segment_score_1 << ", Score 2: " << segment_score_2 << std::endl;
 }
 
 /************************************************/

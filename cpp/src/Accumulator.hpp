@@ -15,6 +15,9 @@
 #include <boost/accumulators/statistics/sum.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
+// C++ Libraries
+#include <sstream>
+
 namespace ba = boost::accumulators;
 
 /**

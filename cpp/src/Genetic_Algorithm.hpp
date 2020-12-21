@@ -10,9 +10,9 @@
 #include <functional>
 
 // Project Libraries
-#include "Accumulator.hpp"
 #include "GA_Config.hpp"
 #include "Exit_Condition.hpp"
+#include "Stats_Aggregator.hpp"
 #include "Thread_Pool.hpp"
 #include "WaypointList.hpp" // REMOVE ME!
 
@@ -44,6 +44,14 @@ class Genetic_Algorithm
         }
 
         /**
+         * @brief Destructor
+         */
+        virtual ~Genetic_Algorithm()
+        {
+            m_aggregator.Write_Stats_Info( m_config.stats_output_pathname );
+        }
+
+        /**
          * @brief Run the GA
          */
         std::vector<Phenotype> Run( int                   max_iterations = 1000,
@@ -69,6 +77,7 @@ class Genetic_Algorithm
             for( int iteration = 0; iteration < max_iterations; iteration++ )
             {
                 BOOST_LOG_TRIVIAL(debug) << "Starting Iteration " << iteration << " of " << max_iterations;
+                auto start_loop_time = std::chrono::steady_clock::now();
 
                 // Define a subset for Selection
                 auto selectionStartIdx = preservation_size;
@@ -132,7 +141,13 @@ class Genetic_Algorithm
                 std::sort( m_population.begin(), m_population.end() );
 
                 BOOST_LOG_TRIVIAL(debug) << "Iteration: " << iteration << ", Current Best Matches: " << Print_Population_List( m_population, 10 );
-                
+
+                auto iter_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_loop_time );
+                m_aggregator.Report_Iteration_Complete( m_population.front().Get_Number_Waypoint(), 
+                                                        iteration,
+                                                        m_population.front().Get_Fitness(),
+                                                        iter_time_ms.count() );
+
                 // Check Exit Condition
                 if( exit_condition->Check_Exit( m_population.front().Get_Fitness() ) )
                 {
@@ -158,5 +173,8 @@ class Genetic_Algorithm
 
         // Random Algorithm
         std::function<void(Phenotype&)> m_random_algorithm;
+
+        // Stats Aggregation Class
+        Stats_Aggregator m_aggregator;
         
 }; // End of Genetic_Algorithm Class

@@ -39,6 +39,14 @@ class WaypointList
                       size_t      y_digits );
 
         /**
+         * @brief Get the Number of Waypoints
+         */
+        size_t Get_Number_Waypoint() const
+        {
+            return m_number_points;
+        }
+
+        /**
          * @brief Get the Fitness Score
          */
         double Get_Fitness() const;
