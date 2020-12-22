@@ -58,6 +58,7 @@ Options Parse_Command_Line( int argc, char* argv[] )
     output.ga_config.mutation_rate     = output.mutation_rate;
     output.ga_config.preservation_rate = output.preservation_rate;
     output.ga_config.selection_rate    = output.selection_rate;
+    output.ga_config.random_vert_rate  = output.random_vert_rate;
 
     return output;
 }

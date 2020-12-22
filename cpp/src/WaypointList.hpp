@@ -60,12 +60,18 @@ class WaypointList
         /**
          * @brief Compute a new fitness score
          */
-        void Update_Fitness( void* context_info );
+        void Update_Fitness( void* context_info,
+                             bool  check_fitness );
 
         /**
          * @brief Get the vertices from the dna strand
          */
         std::vector<Point<double>> Get_Vertices() const;
+
+        /**
+         * @brief Randomize the Vertices
+        */
+        void Randomize_Vertices( const WaypointList& wp );
 
         /**
          * @brief Convert to loggable string

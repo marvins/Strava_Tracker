@@ -11,9 +11,13 @@
 #include "Geometry.hpp"
 
 // C++ Libraries
+#include <algorithm>
+#include <cassert>
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <sstream>
 
 static double global_min_segment_length = std::numeric_limits<double>::max();
@@ -54,13 +58,14 @@ void WaypointList::Set_Fitness( double fitness )
 /************************************************************************/
 /*           Update the Fitness Score Against the Point List            */
 /************************************************************************/
-void WaypointList::Update_Fitness( void* context_info )
+void WaypointList::Update_Fitness( void* context_info,
+                                   bool  check_fitness )
 {
     // Skip everything if the fitness is still valid
-    //if( m_fitness >= 0 )
-    //{
-    //    return;
-    //}
+    if( check_fitness && m_fitness >= 0 )
+    {
+        return;
+    }
 
     // Cast to the point list
     auto point_list = *reinterpret_cast<std::vector<DB_Point>*>( context_info );
@@ -81,26 +86,16 @@ void WaypointList::Update_Fitness( void* context_info )
     m_fitness = ( m_fitness * 1000 ) / point_list.size();
 
     double total_length = 0;
-    //double segment_score_1 = 0;
-    //double segment_score_2 = 0;
-    //double score1, score2;
     for( size_t i=0; i<(vertices.size()-1); i++ )
     {
         double segment_length = Point<double>::Distance_L2( vertices[i], vertices[i+1] );
         total_length += segment_length;
-    //    score1 = segment_length / segment_histogram[i];
-    //    score2 = (segment_length*segment_length) / (segment_histogram[i]*segment_histogram[i]);
-    //    //std::cout << "Segment: " << i << ", Length: " << segment_length << ", #Points: " << segment_histogram[i] << ", Score1: " << score1 << ", Score2: " << score2 << std::endl;
-    //    segment_score_1 += score1;
-    //    segment_score_2 += score2;
     }
     if( total_length < global_min_segment_length )
     {
         global_min_segment_length = total_length;
     }
     m_fitness += 1000 * (total_length / global_min_segment_length);
-    //m_fitness += segment_score_2;
-    //std::cout << "Segment Score 1: " << segment_score_1 << ", Score 2: " << segment_score_2 << std::endl;
 }
 
 /************************************************/
@@ -117,6 +112,26 @@ std::vector<Point<double>> WaypointList::Get_Vertices() const
     }
 
     return waypoints;
+}
+
+/****************************************/
+/*          Randomize Vertices          */
+/****************************************/
+void WaypointList::Randomize_Vertices( const WaypointList& wp )
+{
+    // Get the vertices
+    auto verts = wp.Get_Vertices();
+
+    std::shuffle( verts.begin(), verts.end(), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()) );
+    std::stringstream dna;
+    for( size_t i=0; i<wp.m_number_points; i++ )
+    {
+        dna << std::setfill('0') << std::setw(m_x_digits) << verts[i].x();
+        dna << std::setfill('0') << std::setw(m_y_digits) << verts[i].y();
+    }
+    m_dna = dna.str();
+    assert( m_dna.size() == dna.str().size() );
+    m_fitness = -1;
 }
 
 /****************************************/

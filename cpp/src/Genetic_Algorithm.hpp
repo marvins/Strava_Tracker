@@ -34,12 +34,14 @@ class Genetic_Algorithm
                            std::function<Phenotype(const Phenotype&, 
                                                    const Phenotype&)> crossover_algorithm,
                            std::function<void(Phenotype&)>            mutation_algorithm,
-                           std::function<void(Phenotype&)>            random_algorithm )
+                           std::function<void(Phenotype&)>            random_algorithm,
+                           bool                                       append_stats )
           : m_config( config ),
             m_population(population),
             m_crossover_algorithm(crossover_algorithm),
             m_mutation_algorithm(mutation_algorithm),
-            m_random_algorithm(random_algorithm)
+            m_random_algorithm(random_algorithm),
+            m_append_stats(append_stats)
         {
         }
 
@@ -48,7 +50,8 @@ class Genetic_Algorithm
          */
         virtual ~Genetic_Algorithm()
         {
-            m_aggregator.Write_Stats_Info( m_config.stats_output_pathname );
+            m_aggregator.Write_Stats_Info( m_config.stats_output_pathname,
+                                           m_append_stats );
         }
 
         /**
@@ -62,6 +65,8 @@ class Genetic_Algorithm
             size_t selection_size    = m_config.selection_rate * m_population.size();
             size_t preservation_size = std::max( 1.0, m_config.preservation_rate * m_population.size());
             size_t mutation_size     = std::max( 0.0, m_config.mutation_rate * m_population.size());
+            size_t random_vert_size  = std::max( 0.0, m_config.random_vert_rate * m_population.size());
+            size_t expected_population_size = m_population.size();
 
             {
                 // Capture a log of the configuration structure as this is really important
@@ -70,12 +75,14 @@ class Genetic_Algorithm
                 sout << "Preservation Size : " << preservation_size << std::endl;
                 sout << "Selection Size    : " << selection_size << std::endl;
                 sout << "Crossover Size    : " << m_population.size() - (preservation_size + selection_size) << std::endl;
+                sout << "Random Vertex Size: " << random_vert_size << std::endl;
                 BOOST_LOG_TRIVIAL(debug) << sout.str();
             }
 
             // Run the iterations
             for( int iteration = 0; iteration < max_iterations; iteration++ )
             {
+                assert( expected_population_size == m_population.size() );
                 BOOST_LOG_TRIVIAL(debug) << "Starting Iteration " << iteration << " of " << max_iterations;
                 auto start_loop_time = std::chrono::steady_clock::now();
 
@@ -98,43 +105,73 @@ class Genetic_Algorithm
                 }
 
                 // Run Mutation
+                auto start_mutation = std::chrono::steady_clock::now();
                 for( size_t midx = 0; midx < mutation_size; midx++ )
                 {
                     // Do not run mutation on the preservation set!
                     size_t mutationIdx = rand() % (m_population.size() - selectionStartIdx) + selectionStartIdx;
                     m_mutation_algorithm( m_population[mutationIdx] ); 
                 }
+                auto mutation_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_mutation );
+                m_aggregator.Report_Timing( "Mutation", mutation_time );
 
                 // Update Fitness Scores
+                auto start_fitness = std::chrono::steady_clock::now();
                 {
                     Thread_Pool pool;
                     for( auto& member : m_population )
                     {
                         pool.enqueue_work([&member, context_info]() {
-                            member.Update_Fitness( context_info );
+                            member.Update_Fitness( context_info,
+                                                   false );
                         });
                     }
+                    auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness );
+                    m_aggregator.Report_Timing( "First Fitness Jobs", fitness_time );
                 }
+                auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness );
+                m_aggregator.Report_Timing( "First Fitness Full", fitness_time );
 
                 // Randomize Unique Entries (No point in crossing-over yourself over and over)
+                auto start_unique = std::chrono::steady_clock::now();
                 std::sort( m_population.begin(), m_population.end() );
                 auto end_of_unique_iter = std::unique( m_population.begin(), m_population.end() );
 
+                // For the first X random entries, randomize the vertices of the top choice
+                for( int x=0; 
+                     (x < random_vert_size) && (end_of_unique_iter != m_population.end());
+                     x++, end_of_unique_iter++ )
+                {
+                    size_t rvidx = rand() % preservation_size;
+                    end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
+                    m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(),
+                                                         iteration );
+                }
+
+                // For the rest, just create purely unique items
                 for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
                 {
-                    //BOOST_LOG_TRIVIAL(debug) << "DUPLICATE FOUND. " << end_of_unique_iter->To_String();
                     // Randomize entry
                     m_random_algorithm( *end_of_unique_iter );
+                    m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(),
+                                                         iteration );
                 }
+                auto unique_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_unique );
+                m_aggregator.Report_Timing( "Unique Full", unique_time );
+
                 // Update Fitness Scores
+                start_fitness = std::chrono::steady_clock::now();
                 {
                     Thread_Pool pool;
                     for( auto& member : m_population )
                     {
                         pool.enqueue_work([&member, context_info]() {
-                            member.Update_Fitness( context_info );
+                            member.Update_Fitness( context_info,
+                                                   true );
                         });
                     }
+                    fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness );
+                    m_aggregator.Report_Timing( "Second Fitness Jobs", fitness_time );
                 }
 
                 // Sort the population one last time
@@ -176,5 +213,8 @@ class Genetic_Algorithm
 
         // Stats Aggregation Class
         Stats_Aggregator m_aggregator;
+
+        // Append the Stats File 
+        bool m_append_stats { false };
         
 }; // End of Genetic_Algorithm Class

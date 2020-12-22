@@ -41,6 +41,13 @@ void Stats_Aggregator::Report_Iteration_Complete( size_t   num_waypoints,
                                                   double   best_fitness,
                                                   double   iteration_time_ms )
 {
+    BOOST_LOG_TRIVIAL(debug) << "Logging Iteration Complete. Waypoints: " << num_waypoints
+                             << ", Iteration: " << iteration_number << ", Fitness: "
+                             << best_fitness << std::fixed << ", Time: " << iteration_time_ms;
+    if( m_iteration_info.find(num_waypoints) == m_iteration_info.end() )
+    {
+        m_iteration_info[num_waypoints] = std::map<size_t,std::tuple<double,double>>();
+    }
     m_iteration_info[num_waypoints][iteration_number] = std::make_tuple( best_fitness,
                                                                          iteration_time_ms );
 }
@@ -57,12 +64,24 @@ void Stats_Aggregator::Report_Duplicate_Entry( size_t   num_waypoints,
 /****************************************/
 /*          Write Stats Info            */
 /****************************************/
-void Stats_Aggregator::Write_Stats_Info( const std::string& output_pathname )
+void Stats_Aggregator::Write_Stats_Info( const std::string& output_pathname,
+                                         bool               append_file )
 {
     // Write the iteration file
     std::ofstream fout;
-    fout.open((output_pathname + ".iteration.csv").c_str());
-    fout << "NumWaypoints,Iteration,BestFitness,IterationTimeMs" << std::endl;
+
+    auto pname = output_pathname + ".iteration.csv";
+    if( append_file )
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Reopening " << pname;
+        fout.open(pname.c_str(), std::ios_base::app );
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Opening " << pname;
+        fout.open(pname.c_str());
+        fout << "NumWaypoints,Iteration,BestFitness,IterationTimeMs" << std::endl;
+    }
     for( const auto& wp : m_iteration_info )
     {
         for( const auto& iteration : wp.second )
@@ -73,8 +92,18 @@ void Stats_Aggregator::Write_Stats_Info( const std::string& output_pathname )
     fout.close();
 
     // Write Duplicate File
-    fout.open((output_pathname + ".duplicates.csv").c_str());
-    fout << "NumWaypoints,Iteration,NumberDuplicates" << std::endl;
+    pname = output_pathname + ".duplicates.csv";
+    if( append_file )
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Reopening " << pname;
+        fout.open(pname.c_str(), std::ios_base::app );
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(debug) << "Opening " << pname;
+        fout.open(pname.c_str());
+        fout << "NumWaypoints,Iteration,NumberDuplicates" << std::endl;
+    }
     for( const auto& wp : m_duplicate_info )
     {
         for( const auto& iteration : wp.second )

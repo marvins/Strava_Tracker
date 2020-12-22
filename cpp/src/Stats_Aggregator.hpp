@@ -49,7 +49,8 @@ class Stats_Aggregator
         /**
          * @brief Writing Stats Data to File
          */
-        void Write_Stats_Info( const std::string& output_pathname );
+        void Write_Stats_Info( const std::string& output_pathname,
+                               bool               append_file );
 
     private:
 

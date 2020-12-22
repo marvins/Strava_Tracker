@@ -71,20 +71,6 @@ int main( int argc, char* argv[] )
     // Master List of Vertices
     std::map<int,std::vector<DB_Point>> master_vertex_list;
 
-    // /////////////////////////////////////////////
-    // /////////////////////////////////////////////
-    //auto wp1 = WaypointList( "02919464928027687076744693316470754581838767204309689183", 8, max_x, max_y );
-    // auto wp2 = WaypointList( "40220761471434094086225604007130287", 5, max_x, max_y );
-    //std::cout << "Waypoint 1 (Bad)" << std::endl;
-    //wp1.Update_Fitness( context );
-    // std::cout << "Waypoint 2 (Good)" << std::endl;
-    // wp2.Update_Fitness( context );
-    //std::cout << wp1.To_String(true) << std::endl;
-    // std::cout << wp2.To_String(true) << std::endl;
-    //return 0;
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
-
     // Iterate over each waypoint count
     for( int num_waypoints = options.min_waypoints; 
          num_waypoints <= options.max_waypoints;
@@ -102,7 +88,8 @@ int main( int argc, char* argv[] )
                                             initial_population,
                                             crossover_algorithm,
                                             mutation_algorithm,
-                                            random_algorithm );
+                                            random_algorithm,
+                                            (num_waypoints != options.min_waypoints) );
 
         // Run the GA
         auto population = ga.Run( options.max_iterations,
@@ -135,24 +122,25 @@ int main( int argc, char* argv[] )
         }
         master_vertex_list[num_waypoints] = vertex_point_list;
 
-    } // End of Waypoint Number Loop
-
-    std::ofstream fout;
-    fout.open("waypoints.csv");
-    fout << "NumWaypoints,Fitness,GridZone,Easting,Northing,Latitude,Longitude" << std::endl;
-    for( const auto& num : master_vertex_list )
-    {
-        std::cerr << "Writing vertices for " << num.first << " points" << std::endl;
-        for( const auto& point : num.second )
+        // Write Latest Results
+        std::ofstream fout;
+        fout.open("waypoints.csv");
+        fout << "NumWaypoints,Fitness,GridZone,Easting,Northing,Latitude,Longitude" << std::endl;
+        for( const auto& num : master_vertex_list )
         {
-            fout << std::fixed << num.first << "," << point.x_norm << "," 
-                 << point.gz << "," << point.easting << "," << point.northing 
-                 << "," << point.latitude << "," << point.longitude << std::endl;
+            std::cerr << "Writing vertices for " << num.first << " points" << std::endl;
+            for( const auto& point : num.second )
+            {
+                fout << std::fixed << num.first << "," << point.x_norm << "," 
+                     << point.gz << "," << point.easting << "," << point.northing 
+                     << "," << point.latitude << "," << point.longitude << std::endl;
+            }
         }
-    }
-    fout.close();
+        fout.close();
 
-    Write_KML( "waypoints.kml", master_vertex_list );    
+        Write_KML( "waypoints.kml", master_vertex_list );    
+    
+    } // End of Waypoint Number Loop
 
     // Cleanup
     sqlite3_close(db);

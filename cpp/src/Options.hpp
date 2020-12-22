@@ -31,19 +31,19 @@ struct Options
     GA_Config ga_config;
 
     // Minimum Number of Waypoints
-    int min_waypoints { 4 };
+    int min_waypoints { 8 };
 
     // Max Number of Waypoints
-    int max_waypoints { 4 };
+    int max_waypoints { 14 };
 
     // Exit Condition
     Exit_Condition::ptr_t exit_condition;
 
     /// Population Size
-    size_t population_size { 50 };
+    size_t population_size { 2000 };
 
     /// Max Number of Iterations
-    size_t max_iterations { 10 };
+    size_t max_iterations { 500 };
 
     /// Exit Repeats ( Should be some percentage of the total iterations )
     size_t exit_repeats { (size_t)(0.1 * max_iterations) };
@@ -52,6 +52,7 @@ struct Options
     double preservation_rate { 0.01 };
     double selection_rate { 0.5 };
     double mutation_rate { 0.7 };
+    double random_vert_rate { 0.05 };
 
 }; // End of Options Class
 

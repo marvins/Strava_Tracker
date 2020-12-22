@@ -35,23 +35,13 @@ TEST( Geometry, Point_Line_Distance)
     Point<double> p1( 1, 6 );
     Point<double> p2( 6, 3 );
     Point<double> p3( 1, 7 );
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-    std::cout << Point_Line_Distance( p1, v1, v2 ) << std::endl;
-    std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
-    std::cout << Point_Line_Distance( p1, v2, v3 ) << std::endl;
-    std::cout << "CCCCCCCCCCCCCCCCCCCCCCCCCCCC" << std::endl;
-    std::cout << Point_Line_Distance( p2, v1, v2 ) << std::endl;
-    std::cout << "DDDDDDDDDDDDDDDDDDDDDDDDDDDD" << std::endl;
-    std::cout << Point_Line_Distance( p2, v2, v3 ) << std::endl;
 
-    std::cout << "EEEEEEEEEEEEEEEEEEEEEEEEEEEE" << std::endl;
-    std::cout << Point_Line_Distance( p1, v1, v3 ) << std::endl;
-    std::cout << "FFFFFFFFFFFFFFFFFFFFFFFFFFFF" << std::endl;
-    std::cout << Point_Line_Distance( p2, v1, v3 ) << std::endl;
-
-    std::cout << "GGGGGGGGGGGGGGGGGGGGGGGGGGGG" << std::endl;
-    std::cout << Point_Line_Distance( p3, v1, v2 ) << std::endl;
-    std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;
-    std::cout << Point_Line_Distance( p3, v1, v3 ) << std::endl;
-
+    ASSERT_NEAR( Point_Line_Distance( p1, v1, v2 ), 1, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p1, v2, v3 ), 1, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p2, v1, v2 ), 4, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p2, v2, v3 ), 3, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p1, v1, v3 ), 3.90434, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p2, v1, v3 ), 1.87409, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p3, v1, v2 ), 1.41421, 0.001 );
+    ASSERT_NEAR( Point_Line_Distance( p3, v1, v3 ), 4.52904, 0.001 );
 }
