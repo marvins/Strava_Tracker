@@ -16,6 +16,10 @@ For Plotly Packages
     pip3 install plotly
     jupyter labextension install jupyterlab-plotly
     jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget
+
+Genetic Algorithm Dependencies
+
+    sudo apt install cmake g++ libboost-all-dev libgdal-dev gdal-bin
     
 ## Recommended Tools
 
@@ -24,8 +28,7 @@ For Plotly Packages
 ##  C++ Module
     
     git submodule add git@github.com:google/googletest.git
-    git submodule init
-    git submodule update
+    git submodule update --init
     
 ## Starting Project
 
