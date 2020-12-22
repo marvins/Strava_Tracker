@@ -47,7 +47,7 @@ int main( int argc, char* argv[] )
     auto sector_ids = Load_Sector_IDs( db );
    
     // For Each Sector, Load the points
-    auto point_list = Load_Point_List( db );
+    auto point_list = Load_Point_List( db, options.db_sector_id );
 
     // Get point range
     auto point_range = Normalize_Points( point_list );
@@ -70,6 +70,16 @@ int main( int argc, char* argv[] )
 
     // Master List of Vertices
     std::map<int,std::vector<DB_Point>> master_vertex_list;
+
+    // /////////////////////////////////////////////
+    // /////////////////////////////////////////////
+    // auto wp1 = WaypointList( "08210299021903430015092402001517010008700195058601241099029719860700234208460033", 10, max_x, max_y );
+    // std::cout << "Waypoint 1 (Good)" << std::endl;
+    // wp1.Update_Fitness( context, false );
+    // std::cout << wp1.To_String(true) << std::endl;
+    // return 0;
+    // //////////////////////////////////////////////
+    // //////////////////////////////////////////////
 
     // Iterate over each waypoint count
     for( int num_waypoints = options.min_waypoints; 

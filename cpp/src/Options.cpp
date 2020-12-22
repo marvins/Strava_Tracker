@@ -10,6 +10,9 @@
 #include <filesystem>
 #include <iostream>
 
+// Boost Libraries
+#include <boost/log/trivial.hpp>
+
 /************************************************/
 /*          Parse Command-Line Options          */
 /************************************************/
@@ -43,6 +46,74 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.db_path = args.front();
             args.pop_front();
         }
+
+        // Check Mutation Rate
+        if( arg == "-m" )
+        {
+            output.mutation_rate = std::stod( args.front() );
+            args.pop_front();
+        }
+
+        // Check Preservation Rate
+        if( arg == "-p" )
+        {
+            output.preservation_rate = std::stod( args.front() );
+            args.pop_front();
+        }
+
+        // Check Selection Rate
+        if( arg == "-s" )
+        {
+            output.selection_rate = std::stod( args.front() );
+            args.pop_front();
+        }
+
+        // Random Vert Rate
+        if( arg == "-r" )
+        {
+            output.random_vert_rate = std::stod( args.front() );
+            args.pop_front();
+        }
+
+        // Vertices
+        if( arg == "-maxw" )
+        {
+            output.max_waypoints = std::stoi( args.front() );
+            args.pop_front();
+        }
+        if( arg == "-minw" )
+        {
+            output.min_waypoints = std::stoi( args.front() );
+            args.pop_front();
+        }
+
+        if( arg == "-err" )
+        {
+            output.exit_repeats = std::stod( args.front() );
+            args.pop_front();
+        }
+
+        if( arg == "-epsg" )
+        {
+            output.epsg_code = std::stoi( args.front() );
+            args.pop_front();
+        }
+
+        if( arg == "-pop" )
+        {
+            output.population_size = std::stoi( args.front() );
+            args.pop_front();
+        }
+        if( arg == "-i" )
+        {
+            output.max_iterations = std::stoi( args.front() );
+            args.pop_front();
+        }
+        if( arg == "-stats" )
+        {
+            output.ga_config.stats_output_pathname = args.front();
+            args.pop_front();
+        }
     }
 
     // Check if filesystem exists
@@ -51,6 +122,8 @@ Options Parse_Command_Line( int argc, char* argv[] )
         std::cerr << "database file does not exist: " << output.db_path << std::endl;
         Usage( output );
     }
+
+    // Max Vertices
 
     // Create Exit Condition
     output.exit_condition = std::make_shared<Exit_Condition>( output.exit_repeats, 0.001 );
@@ -68,9 +141,40 @@ Options Parse_Command_Line( int argc, char* argv[] )
 /****************************************************/
 void Usage( const Options& options )
 {
-    std::cerr << "error: " << options.program_name << " -d <db-name> " << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "   -h : Print usage instructions." << std::endl;
-    std::cerr << std::endl;
+    std::stringstream sin;
+    sin << "error: " << options.program_name << " -d <db-name> " << std::endl;
+    sin << std::endl;
+    sin << "   -h : Print usage instructions." << std::endl;
+    sin << std::endl;
+    sin << "Required Arguments" << std::endl;
+    sin << "   -d <path> : Path to point database file." << std::endl;
+    sin << "Optional Arguments" << std::endl;
+    sin << "   -m <float> : Mutation Rate [0-1]" << std::endl;
+    sin << "       - Default: " << options.mutation_rate << std::endl;
+    sin << "   -p <float> : Preservation Rate [0-1]" << std::endl;
+    sin << "       - Default: " << options.preservation_rate << std::endl;
+    sin << "   -s <float> : Selection Rate [0-1]" << std::endl;
+    sin << "       - Default: " << options.selection_rate << std::endl;
+    sin << "   -r <float> : Random Vertex Mutation Rate [0-1]" << std::endl;
+    sin << "       - Default: " << options.random_vert_rate << std::endl;
+    sin << "   -maxw <int> : Max Number of Waypoints [1+]" << std::endl;
+    sin << "       - Default: " << options.max_waypoints << std::endl;
+    sin << "   -minw <int> : Min Number of Waypoints [1+]" << std::endl;
+    sin << "       - Default: " << options.min_waypoints << std::endl;
+    sin << "   -err <float> : Exit Repeat Ratio [0-1]" << std::endl;
+    sin << "       - Default: " << options.exit_repeats << std::endl;
+    sin << "   -epsg <int>  : EPSG Code for UTM Conversions" << std::endl;
+    sin << "       - Default: " << options.epsg_code << std::endl;
+    sin << "   -pop <int>   : Population Size [10+]" << std::endl;
+    sin << "       - Default: " << options.population_size << std::endl;
+    sin << "   -i <int>     : Max Number of Iterations for Population [1+]" << std::endl;
+    sin << "       - Default: " << options.max_iterations << std::endl;
+    sin << "   -stats <path>: Path to statistics file" << std::endl;
+    sin << "       - Default: " << options.ga_config.stats_output_pathname << std::endl;
+    sin << "   -sector_id <int>: Sector ID to query on.  Skip entry to do all points or value < 0" << std::endl;
+    sin << "       - Default: " << options.db_sector_id << std::endl;
+    
+    sin << std::endl;
+    BOOST_LOG_TRIVIAL(warning) << sin.str();
     std::exit(-1);
 }

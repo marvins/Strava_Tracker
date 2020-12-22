@@ -20,7 +20,7 @@
 #include <random>
 #include <sstream>
 
-static double global_min_segment_length = std::numeric_limits<double>::max();
+static double global_min_segment_length = -1;
 
 /********************************/
 /*          Constructor         */
@@ -74,28 +74,29 @@ void WaypointList::Update_Fitness( void* context_info,
     auto vertices = Get_Vertices();
 
     // Map each reference point against it's "best-fit" line-segment
-    m_fitness = 0;
+    m_point_score = 0;
     std::map<int,int> segment_histogram;
     for( const auto& point : point_list )
     {
-        m_fitness += Find_Best_Segment_Error( Point( point.x_norm, point.y_norm ), 
-                                              vertices,
-                                              segment_histogram );
+        m_point_score += Find_Best_Segment_Error( Point( point.x_norm, point.y_norm ), 
+                                                  vertices,
+                                                  segment_histogram );
     }
     // Normalize Fitness
-    m_fitness = ( m_fitness * 1000 ) / point_list.size();
+    m_point_score /= point_list.size();
 
-    double total_length = 0;
+    m_segment_score = 0;
     for( size_t i=0; i<(vertices.size()-1); i++ )
     {
-        double segment_length = Point<double>::Distance_L2( vertices[i], vertices[i+1] );
-        total_length += segment_length;
+        m_segment_score += Point<double>::Distance_L2( vertices[i], vertices[i+1] );
     }
-    if( total_length < global_min_segment_length )
+    if( global_min_segment_length < 0 )
     {
-        global_min_segment_length = total_length;
+        global_min_segment_length = m_segment_score; 
     }
-    m_fitness += 1000 * (total_length / global_min_segment_length);
+    m_segment_score = 100 * ( m_segment_score / global_min_segment_length );
+
+    m_fitness = m_point_score + m_segment_score;
 }
 
 /************************************************/
@@ -236,7 +237,7 @@ std::vector<WaypointList> Build_Random_Waypoints( size_t population_size,
 std::string WaypointList::To_String( bool show_vertices ) const
 {
     std::stringstream sout;
-    sout << "DNA: [" << m_dna << "], Points: [" << m_number_points << "] Fitness: [" << std::fixed << m_fitness << "]";
+    sout << "DNA: [" << m_dna << "], Points: [" << m_number_points << "] Fitness: [" << std::fixed << m_fitness << "], Point Score: [" << m_point_score << "], Seg Score: [" << m_segment_score << "]";
     if( show_vertices )
     {
         sout << std::endl;

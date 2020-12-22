@@ -23,4 +23,4 @@ std::vector<std::string>  Load_Sector_IDs( sqlite3 *db );
 /**
  * @brief Load the Point List
  */
-std::vector<DB_Point> Load_Point_List( sqlite3* db );
+std::vector<DB_Point> Load_Point_List( sqlite3* db, int sector_id );
