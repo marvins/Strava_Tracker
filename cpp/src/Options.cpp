@@ -119,7 +119,26 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.db_sector_id = std::stoi( args.front() );
             args.pop_front();
         }
-    }
+        if( arg == "-nt" )
+        {
+            output.number_threads = std::stoi( args.front() );
+            args.pop_front();
+        }
+        if( arg == "-start_point" )
+        {
+            output.start_latitude = std::stod( args.front() );
+            args.pop_front();
+            output.start_longitude = std::stod( args.front() );
+            args.pop_front();
+        }
+        if( arg == "-end_point" )
+        {
+            output.end_latitude = std::stod( args.front() );
+            args.pop_front();
+            output.end_longitude = std::stod( args.front() );
+            args.pop_front();
+        }
+    }   
 
     // Check if filesystem exists
     if( !std::filesystem::exists( std::filesystem::path( output.db_path ) ) )
@@ -137,6 +156,7 @@ Options Parse_Command_Line( int argc, char* argv[] )
     output.ga_config.preservation_rate = output.preservation_rate;
     output.ga_config.selection_rate    = output.selection_rate;
     output.ga_config.random_vert_rate  = output.random_vert_rate;
+    output.ga_config.number_threads    = output.number_threads;
 
     return output;
 }
@@ -153,6 +173,8 @@ void Usage( const Options& options )
     sin << std::endl;
     sin << "Required Arguments" << std::endl;
     sin << "   -d <path> : Path to point database file." << std::endl;
+    sin << "   -start_point <lat> <lon> : Starting coordinate" << std::endl;
+    sin << "   -end_point <lat> <lon> : Ending coordinate" << std::endl;
     sin << "Optional Arguments" << std::endl;
     sin << "   -m <float> : Mutation Rate [0-1]" << std::endl;
     sin << "       - Default: " << options.mutation_rate << std::endl;
@@ -178,7 +200,8 @@ void Usage( const Options& options )
     sin << "       - Default: " << options.ga_config.stats_output_pathname << std::endl;
     sin << "   -sector_id <int>: Sector ID to query on.  Skip entry to do all points or value < 0" << std::endl;
     sin << "       - Default: " << options.db_sector_id << std::endl;
-    
+    sin << "   -nt <int>    : Number of threads to use in the population fitness update." << std::endl;
+    sin << "       - Default: " << options.number_threads << std::endl;
     sin << std::endl;
     BOOST_LOG_TRIVIAL(warning) << sin.str();
     std::exit(-1);

@@ -23,6 +23,8 @@ add_executable( route_finder
                 KML_Writer.cpp
                 Options.hpp
                 Options.cpp
+                Point.hpp
+                Point.cpp
                 Stats_Aggregator.hpp
                 Stats_Aggregator.cpp
                 Thread_Pool.hpp

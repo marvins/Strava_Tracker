@@ -20,149 +20,8 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
-BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(boost::geometry::cs::cartesian)
-
-/**
- * @class Point
- * @brief Utility Class for Point Operations
-*/
-template <typename value_type = double>
-class Point
-{
-    public:
-
-        Point() = default;
-
-        Point( double x, double y )
-        {
-            m_data[0] = x;
-            m_data[1] = y;
-        }
-
-        /**
-         * @brief Get X Value
-         */
-        double x() const
-        {
-            return m_data[0];
-        }
-        double& x() 
-        {
-            return m_data[0];
-        }
-
-        /**
-         * @brief Get Y Value
-         */
-        double y() const
-        {
-            return m_data[1];
-        }
-        double& y() 
-        {
-            return m_data[1];
-        }
-
-        /**
-         * @brief Add in-place operator
-         */
-        Point<value_type>& operator += ( const Point<value_type>& rhs )
-        {
-            m_data[0] += rhs.m_data[0];
-            m_data[1] += rhs.m_data[1];
-            return *this;
-        }
-
-        /**
-         * @brief Subtract in-place operator
-         */
-        Point<value_type>& operator -= ( const Point<value_type>& rhs )
-        {
-            m_data[0] -= rhs.m_data[0];
-            m_data[1] -= rhs.m_data[1];
-            return *this;
-        }
-
-        /**
-         * @brief Magnitude
-         */
-        double Magnitude() const
-        {
-            return sqrt( x() * x() + y() * y() );
-        }
-
-        /**
-         * @brief Distance
-         */
-        static double Distance_L2( const Point<value_type>& p1,
-                                   const Point<value_type>& p2 )
-        {
-            return sqrt( (p1.x() - p2.x())*(p1.x() - p2.x()) + (p1.y() - p2.y())*(p1.y() - p2.y()));
-        }
-
-        /**
-         * @brief Perform Linear Interpolation
-        */
-        static Point<value_type> LERP( const Point<value_type>& pt1, 
-                                       const Point<value_type>& pt2,
-                                       double           ratio )
-        {
-            return (((1-ratio) * pt1) + (ratio * pt2));
-        }
-
-        /**
-         * @brief Print to Log-Friendly String
-         */
-        std::string To_String() const
-        {
-            std::stringstream sout;
-            sout << "Point: " << std::fixed << x() << ", " << y();
-            return sout.str();
-        }
-
-        // Underlying Datatype
-        std::array<double,2> m_data { 0, 0 };
-
-}; // End of Point Class
-
-template <typename TP>
-Point<TP> operator + ( const Point<TP>& p1, const Point<TP>& p2 )
-{
-    Point<TP> output( p1.m_data[0] + p2.m_data[0],
-                      p1.m_data[1] + p2.m_data[1] );
-    return output;
-}
-
-template <typename TP>
-Point<TP> operator - ( const Point<TP>& p1, const Point<TP>& p2 )
-{
-    Point<TP> output( p1.m_data[0] - p2.m_data[0],
-                      p1.m_data[1] - p2.m_data[1] );
-    return output;
-}
-
-/**
- * @brief Perform Multiplication with a Scalar
-*/
-template <typename TP, typename S>
-Point<TP> operator * ( const Point<TP>& pt, S scalar )
-{
-    Point<TP> output( pt.m_data[0] * scalar,
-                      pt.m_data[1] * scalar );
-    return output;
-}
-
-/**
- * @brief Perform Multiplication with a Scalar
-*/
-template <typename TP, typename S>
-Point<TP> operator * ( S scalar, const Point<TP>& pt )
-{
-    Point<TP> output( scalar * pt.m_data[0],
-                      scalar * pt.m_data[1] );
-    return output;
-}
-
+// Project Libraries
+#include "Point.hpp"
 
 /**
  * @brief Compute the distance from the point to the line segment
@@ -170,8 +29,10 @@ Point<TP> operator * ( S scalar, const Point<TP>& pt )
  * @param l1 First point on line segment
  * @param l2 Second point on line segment
  */
-template <typename TP>
-double Point_Line_Distance( const Point<TP>& p, const Point<TP>& l1, const Point<TP>& l2 )
+ template <typename TP, size_t Dims>
+double Point_Line_Distance( const Point_<TP,Dims>& p, 
+                            const Point_<TP,Dims>& l1, 
+                            const Point_<TP,Dims>& l2 )
 {
     // Build lines
     auto v_21 = l2 - l1;
@@ -183,29 +44,34 @@ double Point_Line_Distance( const Point<TP>& p, const Point<TP>& l1, const Point
 
     if( p_1 > 0 )
     {
-        return Point<TP>::Distance_L2( p, l2 );
+        return Point_<TP,Dims>::Distance_L2( p, l2 );
     }
     if( p_2 < 0 )
     {
-        return Point<TP>::Distance_L2( p, l1 );
+        return Point_<TP,Dims>::Distance_L2( p, l1 );
     }
     // If the 2 line segment points are the same, just do distance
-    if( v_21.Magnitude() < 0.01 )
+    if( v_21.Mag() < 0.01 )
     {
-        return Point<TP>::Distance_L2( p, l1 );
+        return Point_<TP,Dims>::Distance_L2( p, l1 );
     }
     
-    return std::fabs( v_21.x()*v_p1.y() - v_p1.x()*v_21.y()) / v_21.Magnitude();
+    return std::fabs( v_21.x()*v_p1.y() - v_p1.x()*v_21.y()) / v_21.Mag();
 }
 
 
 /**
- * @brief Find the best segment error
+ * @brief Find the best segment error and density
+ * 
+ * This method does 2 things
+ * 1.  Finds the minimum segment distance for a given reference point against all line segments.
+ *
+ * 2.  Checks to see if the reference point is within the "step distance" of any line segment. 
  */
-template <typename TP>
-double Find_Best_Segment_Error( const Point<TP>&              ref_point,
-                                const std::vector<Point<TP>>& vertices,
-                                std::map<int,int>&            segment_histogram )
+template <typename TP, size_t Dims>
+double Find_Best_Segment_Error( const Point_<TP,Dims>&              ref_point,
+                                const std::vector<Point_<TP,Dims>>& vertices,
+                                std::map<int,int>&                  segment_histogram )
 {
     double minSegmentDist = -1;
     int segmentId = -1;
@@ -229,10 +95,10 @@ double Find_Best_Segment_Error( const Point<TP>&              ref_point,
  * @brief March along the line segment, looking for any regions where there are no points present. 
  *        This will help reduce the impact of switchbacks or other behavior.
 */
-template <typename TP>
-double Get_Segment_Density( const std::vector<Point<TP>>& vertices,
-                            const std::vector<Point<TP>>& points,
-                            double                        step_distance )
+template <typename TP, size_t Dims>
+double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
+                            const std::vector<Point_<TP,Dims>>& points,
+                            double                              step_distance )
 {
     double segment_pos = 0;
     double segment_length = 0;
@@ -246,7 +112,7 @@ double Get_Segment_Density( const std::vector<Point<TP>>& vertices,
     {
         // Reset position info for vertex
         segment_pos = 0;
-        segment_length = Point<TP>::Distance_L2( vertices[i], 
+        segment_length = Point_<TP,Dims>::Distance_L2( vertices[i], 
                                                  vertices[i+1] );
 
         // March along segment, one "radius distance" at a time
@@ -263,7 +129,7 @@ double Get_Segment_Density( const std::vector<Point<TP>>& vertices,
             total_steps++;
 
             // Perform interpolation
-            auto test_seg_point = Point<TP>::LERP( vertices[i],
+            auto test_seg_point = Point_<TP,Dims>::LERP( vertices[i],
                                                    vertices[i+1],
                                                    ratio );
             
@@ -272,7 +138,7 @@ double Get_Segment_Density( const std::vector<Point<TP>>& vertices,
             point_found = false;
             for( const auto& ref_point : points )
             {
-                if( Point<TP>::Distance_L2( test_seg_point, ref_point ) < step_distance )
+                if( Point_<TP,Dims>::Distance_L2( test_seg_point, ref_point ) < step_distance )
                 {
                     point_found = true;
                     steps_with_points++;

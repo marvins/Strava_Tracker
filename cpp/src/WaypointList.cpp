@@ -25,17 +25,21 @@ static double global_min_segment_length = -1;
 /********************************/
 /*          Constructor         */
 /********************************/
-WaypointList::WaypointList( std::string dna,
-                            size_t      number_points,
-                            size_t      max_x,
-                            size_t      max_y )
+WaypointList::WaypointList( std::string  dna,
+                            size_t       number_points,
+                            size_t       max_x,
+                            size_t       max_y,
+                            const Point& start_point,
+                            const Point& end_point )
  : m_dna(dna),
    m_fitness( -1 ),
    m_number_points(number_points),
    m_max_x(max_x),
    m_max_y(max_y),
    m_x_digits(log10(max_x) + 1),
-   m_y_digits(log10(max_y) + 1)
+   m_y_digits(log10(max_y) + 1),
+   m_start_point(start_point),
+   m_end_point(end_point)
 {
 }
 
@@ -58,8 +62,9 @@ void WaypointList::Set_Fitness( double fitness )
 /************************************************************************/
 /*           Update the Fitness Score Against the Point List            */
 /************************************************************************/
-void WaypointList::Update_Fitness( void* context_info,
-                                   bool  check_fitness )
+void WaypointList::Update_Fitness( void*             context_info,
+                                   bool              check_fitness,
+                                   Stats_Aggregator& aggregator )
 {
     // Skip everything if the fitness is still valid
     if( check_fitness && m_fitness >= 0 )
@@ -74,6 +79,7 @@ void WaypointList::Update_Fitness( void* context_info,
     auto vertices = Get_Vertices();
 
     // Compute Point-Score:  Map each reference point against it's "best-fit" line-segment
+    auto start_point = std::chrono::steady_clock::now();
     m_point_score = 0;
     std::map<int,int> segment_histogram;
     for( const auto& point : context.geo_point_list )
@@ -83,12 +89,14 @@ void WaypointList::Update_Fitness( void* context_info,
                                                   segment_histogram );
     }
     m_point_score /= context.point_list.size();
+    auto point_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_point ).count() / 1000.0;
+    aggregator.Report_Timing( "Point Density Timing", point_timing );
 
     // Compute Length Score
     m_length_score = 0;
     for( size_t i=0; i<(vertices.size()-1); i++ )
     {
-        m_length_score += Point<double>::Distance_L2( vertices[i], vertices[i+1] );
+        m_length_score += Point::Distance_L2( vertices[i], vertices[i+1] );
     }
     if( global_min_segment_length < 0 )
     {
@@ -97,27 +105,33 @@ void WaypointList::Update_Fitness( void* context_info,
     m_length_score = 100 * ( m_length_score / global_min_segment_length );
 
     // Compute Density Score
+    /*
     const double step_distance = 10;
+    auto start_density = std::chrono::steady_clock::now();
     m_density_score = 100 * Get_Segment_Density( vertices,
                                                  context.geo_point_list,
                                                  step_distance );
-
-    m_fitness = m_point_score + m_length_score + m_density_score;
+    auto density_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_density ).count() / 1000.0;
+    aggregator.Report_Timing( "Segment Density Timing", density_timing );                                                 
+    */
+    m_fitness = m_point_score + m_length_score;// + m_density_score;
 }
 
 /************************************************/
 /*      Get the vertex list from the dna        */
 /************************************************/
-std::vector<Point<double>> WaypointList::Get_Vertices() const
+std::vector<Point> WaypointList::Get_Vertices() const
 {
-    std::vector<Point<double>> waypoints( m_number_points );
+    std::vector<Point> waypoints( m_number_points +1 );
     
+    waypoints[0] = m_start_point;
     for( size_t i=0; i<m_number_points; i++ )
     {
-        waypoints[i].x() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits), m_x_digits ));
-        waypoints[i].y() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits) + m_x_digits, m_y_digits ));
+        waypoints[i+1].x() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits), m_x_digits ));
+        waypoints[i+1].y() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits) + m_x_digits, m_y_digits ));
     }
-
+    waypoints.push_back( m_end_point );
+    
     return waypoints;
 }
 
@@ -160,9 +174,11 @@ bool WaypointList::operator == ( const WaypointList& rhs ) const
 /****************************************************/
 /*          Create a Random Waypoint List           */
 /****************************************************/
-WaypointList WaypointList::Create_Random( size_t number_points,
-                                          size_t max_x,
-                                          size_t max_y )
+WaypointList WaypointList::Create_Random( size_t       number_points,
+                                          size_t       max_x,
+                                          size_t       max_y,
+                                          const Point& start_point,
+                                          const Point& end_point )
 {
     size_t x_digits = log10(max_x) + 1;
     size_t y_digits = log10(max_y) + 1;
@@ -174,7 +190,12 @@ WaypointList WaypointList::Create_Random( size_t number_points,
         dna << std::setfill('0') << std::setw(y_digits) << rand() % max_y;
     }
 
-    return WaypointList( dna.str(), number_points, max_x, max_y );
+    return WaypointList( dna.str(), 
+                         number_points,
+                         max_x,
+                         max_y, 
+                         start_point, 
+                         end_point );
 }
 
 /********************************************************/
@@ -191,7 +212,9 @@ WaypointList WaypointList::Crossover( const WaypointList& wp1,
     return WaypointList( output_dna,
                          wp1.m_number_points,
                          wp1.m_max_x,
-                         wp1.m_max_y );
+                         wp1.m_max_y,
+                         wp1.m_start_point,
+                         wp1.m_end_point );
 }
 
 /****************************************/
@@ -222,17 +245,21 @@ void WaypointList::Randomize( WaypointList& wp )
 /********************************************************/
 /*          Create a Random Set of Waypoints            */
 /********************************************************/
-std::vector<WaypointList> Build_Random_Waypoints( size_t population_size,
-                                                  size_t number_points,
-                                                  size_t max_x,
-                                                  size_t max_y )
+std::vector<WaypointList> Build_Random_Waypoints( size_t       population_size,
+                                                  size_t       number_points,
+                                                  size_t       max_x,
+                                                  size_t       max_y,
+                                                  const Point& start_point,
+                                                  const Point& end_point )
 {
     std::vector<WaypointList> output;
     for( size_t i=0; i<population_size; i++ )
     {
         output.push_back( WaypointList::Create_Random( number_points, 
                                                        max_x, 
-                                                       max_y ) );
+                                                       max_y,
+                                                       start_point,
+                                                       end_point ) );
     }
     return output;
 }

@@ -51,11 +51,18 @@ struct Options
     /// Exit Repeats ( Should be some percentage of the total iterations )
     size_t exit_repeats { (size_t)(0.1 * max_iterations) };
 
+    double start_latitude { 0 };
+    double start_longitude { 0 };
+    double end_latitude { 0 };
+    double end_longitude { 0 };
+
     // GA Fields
     double preservation_rate { 0.01 };
     double selection_rate { 0.5 };
     double mutation_rate { 0.7 };
     double random_vert_rate { 0.05 };
+
+    int number_threads = 10;
 
 }; // End of Options Class
 

@@ -8,6 +8,7 @@
 // C++ Libraries
 #include <chrono>
 #include <map>
+#include <mutex>
 #include <string>
 #include <tuple>
 
@@ -29,8 +30,8 @@ class Stats_Aggregator
         /**
          * @brief Report Timing Info
          */
-        void Report_Timing( const std::string&               subsystem,
-                            const std::chrono::microseconds& elapsed_time );
+        void Report_Timing( const std::string&  subsystem,
+                            double              elapsed_time );
 
         /**
          * @brief Report end of a cycle.
@@ -39,12 +40,6 @@ class Stats_Aggregator
                                         size_t   iteration_number,
                                         double   best_fitness,
                                         double   iteration_time_ms );
-
-        /**
-         * @brief Report a duplicate entry.
-         */
-        void Report_Duplicate_Entry( size_t   num_waypoints,
-                                     size_t   iteration_number );
 
         /**
          * @brief Writing Stats Data to File
@@ -56,11 +51,9 @@ class Stats_Aggregator
 
         /// Timing Information
         std::map<std::string,Accumulator<double>> m_timing_info;
+        mutable std::mutex m_timing_mtx;
 
         /// Iteration Information
         std::map<size_t,std::map<size_t,std::tuple<double,double>>> m_iteration_info;
-
-        /// Duplicate Tracker
-        std::map<size_t,std::map<size_t,size_t>> m_duplicate_info;
 
 }; // End of Stats_Aggregator Class

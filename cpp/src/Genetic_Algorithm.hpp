@@ -65,7 +65,6 @@ class Genetic_Algorithm
             size_t selection_size    = m_config.selection_rate * m_population.size();
             size_t preservation_size = std::max( 1.0, m_config.preservation_rate * m_population.size());
             size_t mutation_size     = std::max( 0.0, m_config.mutation_rate * m_population.size());
-            size_t random_vert_size  = std::max( 0.0, m_config.random_vert_rate * m_population.size());
             size_t expected_population_size = m_population.size();
 
             {
@@ -75,7 +74,6 @@ class Genetic_Algorithm
                 sout << "Preservation Size : " << preservation_size << std::endl;
                 sout << "Selection Size    : " << selection_size << std::endl;
                 sout << "Crossover Size    : " << m_population.size() - (preservation_size + selection_size) << std::endl;
-                sout << "Random Vertex Size: " << random_vert_size << std::endl;
                 BOOST_LOG_TRIVIAL(debug) << sout.str();
             }
 
@@ -112,69 +110,28 @@ class Genetic_Algorithm
                     size_t mutationIdx = rand() % (m_population.size() - selectionStartIdx) + selectionStartIdx;
                     m_mutation_algorithm( m_population[mutationIdx] ); 
                 }
-                auto mutation_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_mutation );
+                auto mutation_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_mutation ).count()/1000.0;
                 m_aggregator.Report_Timing( "Mutation", mutation_time );
 
                 // Update Fitness Scores
                 auto start_fitness = std::chrono::steady_clock::now();
                 {
-                    Thread_Pool pool;
+                    Thread_Pool pool( m_config.number_threads );
                     for( auto& member : m_population )
                     {
-                        pool.enqueue_work([&member, context_info]() {
+                        pool.enqueue_work([&]() {
                             member.Update_Fitness( context_info,
-                                                   false );
+                                                   false,
+                                                   m_aggregator );
                         });
                     }
-                    auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness );
-                    m_aggregator.Report_Timing( "First Fitness Jobs", fitness_time );
+                    auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness ).count()/1000.0;
+                    m_aggregator.Report_Timing( "Fitness Jobs", fitness_time );
                 }
-                auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness );
-                m_aggregator.Report_Timing( "First Fitness Full", fitness_time );
+                auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness ).count()/1000.0;
+                m_aggregator.Report_Timing( "Fitness Full", fitness_time );
 
-                // Randomize Unique Entries (No point in crossing-over yourself over and over)
-                auto start_unique = std::chrono::steady_clock::now();
-                std::sort( m_population.begin(), m_population.end() );
-                auto end_of_unique_iter = std::unique( m_population.begin(), m_population.end() );
-
-                // For the first X random entries, randomize the vertices of the top choice
-                for( int x=0; 
-                     (x < random_vert_size) && (end_of_unique_iter != m_population.end());
-                     x++, end_of_unique_iter++ )
-                {
-                    size_t rvidx = rand() % preservation_size;
-                    end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
-                    m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(),
-                                                         iteration );
-                }
-
-                // For the rest, just create purely unique items
-                for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
-                {
-                    // Randomize entry
-                    m_random_algorithm( *end_of_unique_iter );
-                    m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(),
-                                                         iteration );
-                }
-                auto unique_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_unique );
-                m_aggregator.Report_Timing( "Unique Full", unique_time );
-
-                // Update Fitness Scores
-                start_fitness = std::chrono::steady_clock::now();
-                {
-                    Thread_Pool pool;
-                    for( auto& member : m_population )
-                    {
-                        pool.enqueue_work([&member, context_info]() {
-                            member.Update_Fitness( context_info,
-                                                   true );
-                        });
-                    }
-                    fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness );
-                    m_aggregator.Report_Timing( "Second Fitness Jobs", fitness_time );
-                }
-
-                // Sort the population one last time
+                // Sort the population
                 std::sort( m_population.begin(), m_population.end() );
 
                 BOOST_LOG_TRIVIAL(debug) << "Iteration: " << iteration << ", Current Best Matches: " << Print_Population_List( m_population, 10 );
@@ -183,7 +140,7 @@ class Genetic_Algorithm
                 m_aggregator.Report_Iteration_Complete( m_population.front().Get_Number_Waypoint(), 
                                                         iteration,
                                                         m_population.front().Get_Fitness(),
-                                                        iter_time_ms.count() );
+                                                        iter_time_ms.count()/1000.0 );
 
                 // Check Exit Condition
                 if( exit_condition->Check_Exit( m_population.front().Get_Fitness() ) )

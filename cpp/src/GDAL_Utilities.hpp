@@ -15,9 +15,10 @@
  * @brief Create the GDAL Transformer
  */
 OGRCoordinateTransformation* Create_UTM_to_DD_Transformation( int epsg_code );
+OGRCoordinateTransformation* Create_DD_to_UTM_Transformation( int epsg_code );
 
 /**
  * @brief Perform a UTM to DD Conversion
  */
-Point<double> Convert_Coordinate( OGRCoordinateTransformation* transformer, 
-                                  const Point<double>&         utm_coord );
+Point Convert_Coordinate( OGRCoordinateTransformation* transformer, 
+                          const Point&                 utm_coord );

@@ -16,7 +16,10 @@
 /****************************************************************/
 TEST( WaypointList, Randomize_Vertices )
 {
-    auto wp1 = WaypointList( "08210299021903430015092402001517010008700195058601241099029719860700234208460033", 10, 867, 2326 );
+    auto wp1 = WaypointList( "08210299021903430015092402001517010008700195058601241099029719860700234208460033", 
+                             10, 867, 2326, 
+                             ToPoint2D(0,0), 
+                             ToPoint2D(867, 2326) );
     auto verts = wp1.Get_Vertices();
     //BOOST_LOG_TRIVIAL(debug) << "Pre-Randomize: " << wp1.To_String(true);
     auto wp2 = wp1;

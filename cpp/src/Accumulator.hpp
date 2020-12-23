@@ -85,17 +85,18 @@ class Accumulator
             return ba::variance( m_acc );
         }
 
-        std::string To_String( const std::string& message ) const
+        std::string To_String( const std::string& message,
+                               const std::string& units ) const
         {
             std::stringstream sout;
             sout << message << std::endl;
             sout << "  - Count : " << std::fixed << Get_Count() << std::endl;
-            sout << "  - Min   : " << std::fixed << Get_Min() << std::endl;
-            sout << "  - Mean  : " << std::fixed << Get_Mean() << std::endl;
-            sout << "  - Max   : " << std::fixed << Get_Max() << std::endl;
-            sout << "  - StdDev: " << std::fixed << sqrt(Get_Variance()) << std::endl;
-            sout << "  - Var   : " << std::fixed << Get_Variance() << std::endl;
-            sout << "  - Sum   : " << std::fixed << Get_Sum() << std::endl;
+            sout << "  - Min   : " << std::fixed << Get_Min() << " " << units << std::endl;
+            sout << "  - Mean  : " << std::fixed << Get_Mean() << " " << units << std::endl;
+            sout << "  - Max   : " << std::fixed << Get_Max() << " " << units << std::endl;
+            sout << "  - StdDev: " << std::fixed << sqrt(Get_Variance()) << " " << units << std::endl;
+            sout << "  - Var   : " << std::fixed << Get_Variance() << " " << units << std::endl;
+            sout << "  - Sum   : " << std::fixed << Get_Sum() << " " << units << std::endl;
             return sout.str();
         }
 

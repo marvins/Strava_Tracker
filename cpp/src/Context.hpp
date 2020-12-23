@@ -16,7 +16,10 @@ struct Context
 {
     // Reference Point List
     std::vector<DB_Point> point_list;
-    std::vector<Point<double>> geo_point_list;
+    std::vector<Point> geo_point_list;
+
+    Point start_point;
+    Point end_point;
 
     // Density Step Distance
     double density_step_distance;

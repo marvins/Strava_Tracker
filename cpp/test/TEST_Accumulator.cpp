@@ -28,5 +28,5 @@ TEST( Accumulator, Simple_Example )
     ASSERT_NEAR( acc.Get_Mean(), 0, 0.2 );
     ASSERT_EQ( acc.Get_Count(), 102 );
 
-    BOOST_LOG_TRIVIAL(debug) << acc.To_String( "Test Accumulator" );
+    BOOST_LOG_TRIVIAL(debug) << acc.To_String( "Test Accumulator", "ms" );
 }

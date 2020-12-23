@@ -12,4 +12,5 @@ struct GA_Config
     double mutation_rate { 0.75 };
     double random_vert_rate { 0.05 };
     std::string stats_output_pathname { "./ga_run_stats" };
+    size_t number_threads { 1 };
 }; // End of GA_Config Class

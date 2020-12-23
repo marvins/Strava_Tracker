@@ -20,13 +20,25 @@ OGRCoordinateTransformation* Create_UTM_to_DD_Transformation( int epsg_code )
     return OGRCreateCoordinateTransformation( &sourceSRS, &targetSRS );
 }
 
+/************************************************/
+/*      Create Lat-Lon to UTM Transformer       */
+/************************************************/
+OGRCoordinateTransformation* Create_DD_to_UTM_Transformation( int epsg_code )
+{
+    OGRSpatialReference sourceSRS, targetSRS;
+    sourceSRS.SetWellKnownGeogCS( "WGS84" );
+    targetSRS.importFromEPSG( epsg_code );
+
+    return OGRCreateCoordinateTransformation( &sourceSRS, &targetSRS );
+}
+
 /************************************/
 /*      Convert UTM to Lat-Lon      */
 /************************************/
-Point<double> Convert_Coordinate( OGRCoordinateTransformation* transformer, 
-                                  const Point<double>&         utm_coord )
+Point Convert_Coordinate( OGRCoordinateTransformation* transformer, 
+                          const Point&                 utm_coord )
 {
-    Point<double> output = utm_coord;
+    Point output = utm_coord;
     if( !transformer->Transform( 1, &output.m_data[0], &output.m_data[1], 0 ) )
     {
         BOOST_LOG_TRIVIAL(error) << "Transform failed.";

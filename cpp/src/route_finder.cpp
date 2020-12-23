@@ -64,30 +64,36 @@ int main( int argc, char* argv[] )
     WaypointList::mutation_func_tp  mutation_algorithm  = WaypointList::Mutation;
     WaypointList::random_func_tp    random_algorithm    = WaypointList::Randomize;
 
+    // Build Coordinate Transformer
+    auto xform_utm2dd = Create_UTM_to_DD_Transformation( options.epsg_code );
+    auto xform_dd2utm = Create_DD_to_UTM_Transformation( options.epsg_code );
+
+    // Convert Start and End point to the normalized UTM
+    auto start_point = Convert_Coordinate( xform_dd2utm, 
+                                           ToPoint2D( options.start_latitude, 
+                                                      options.start_longitude ) ) - ToPoint2D( std::get<0>(point_range),
+                                                                                               std::get<1>(point_range) );
+    auto end_point = Convert_Coordinate( xform_dd2utm, 
+                                         ToPoint2D( options.end_latitude, 
+                                                    options.end_longitude ) ) 
+                     - ToPoint2D( std::get<0>(point_range), std::get<1>(point_range) );
+    BOOST_LOG_TRIVIAL(debug) << "Starting Point: " << start_point.To_String() << ", Ending Point: " << end_point.To_String();
+    
+    // Construct the Context info
     Context context;
     context.point_list = point_list;
     context.density_step_distance = 5;
+    context.start_point = start_point;
+    context.end_point   = end_point;
     for( const auto& pt : context.point_list )
     {
-        context.geo_point_list.emplace_back( pt.x_norm, pt.y_norm );
+        context.geo_point_list.push_back( ToPoint2D( pt.x_norm, pt.y_norm ) );
     }
     auto context_ptr = reinterpret_cast<void*>( &context );
-    
-    // Build Coordinate Transformer
-    auto coord_xform = Create_UTM_to_DD_Transformation( options.epsg_code );
+
 
     // Master List of Vertices
     std::map<int,std::vector<DB_Point>> master_vertex_list;
-
-    // /////////////////////////////////////////////
-    // /////////////////////////////////////////////
-    // auto wp1 = WaypointList( "08210299021903430015092402001517010008700195058601241099029719860700234208460033", 10, max_x, max_y );
-    // std::cout << "Waypoint 1 (Good)" << std::endl;
-    // wp1.Update_Fitness( context_ptr, false );
-    // std::cout << wp1.To_String(true) << std::endl;
-    // return 0;
-    // //////////////////////////////////////////////
-    // //////////////////////////////////////////////
 
     // Iterate over each waypoint count
     for( int num_waypoints = options.min_waypoints; 
@@ -97,7 +103,9 @@ int main( int argc, char* argv[] )
         // Build the initial population
         std::vector<WaypointList> initial_population = Build_Random_Waypoints( options.population_size,
                                                                                num_waypoints,
-                                                                               max_x, max_y );
+                                                                               max_x, max_y,
+                                                                               start_point,
+                                                                               end_point );
         
         BOOST_LOG_TRIVIAL(debug) << "Initial Population List, " << Print_Population_List( initial_population, 10 );
 
@@ -125,7 +133,7 @@ int main( int argc, char* argv[] )
             DB_Point new_point;
 
             // Add the UTM offsets
-            v += Point<double>( std::get<0>(point_range), std::get<1>(point_range) );
+            v += ToPoint2D( std::get<0>(point_range), std::get<1>(point_range) );
             new_point.gz       = point_list.front().gz;
             new_point.easting  = v.x();
             new_point.northing = v.y();
@@ -133,7 +141,7 @@ int main( int argc, char* argv[] )
             new_point.x_norm = population.front().Get_Fitness();
 
             // Convert to Geographic
-            auto temp_lla = Convert_Coordinate( coord_xform, v );
+            auto temp_lla = Convert_Coordinate( xform_utm2dd, v );
             new_point.latitude  = temp_lla.m_data[0];
             new_point.longitude = temp_lla.m_data[1];
             vertex_point_list.push_back( new_point );

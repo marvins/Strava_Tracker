@@ -12,6 +12,7 @@
 
 // Project Libraries
 #include "Geometry.hpp"
+#include "Stats_Aggregator.hpp"
 
 /**
  * @class WaypointList
@@ -32,11 +33,19 @@ class WaypointList
 
         /**
          * @brief Build a new Phenotype from the string
+         * @param dna Text to use as dna strand
+         * @param number_points Number of points to solve for
+         * @param max_x Max X Value for range computation.
+         * @param max_y Max Y Value for range computation
+         * @param start_point Normalized starting coordinate
+         * @param end_point Normalized ending coordinate.
          */
-        WaypointList( std::string dna,
-                      size_t      number_points,
-                      size_t      x_digits,
-                      size_t      y_digits );
+        WaypointList( std::string  dna,
+                      size_t       number_points,
+                      size_t       max_x,
+                      size_t       max_y,
+                      const Point& start_point,
+                      const Point& end_point );
 
         /**
          * @brief Get the Number of Waypoints
@@ -60,13 +69,14 @@ class WaypointList
         /**
          * @brief Compute a new fitness score
          */
-        void Update_Fitness( void* context_info,
-                             bool  check_fitness );
+        void Update_Fitness( void*             context_info,
+                             bool              check_fitness,
+                             Stats_Aggregator& aggregator );
 
         /**
          * @brief Get the vertices from the dna strand
          */
-        std::vector<Point<double>> Get_Vertices() const;
+        std::vector<Point> Get_Vertices() const;
 
         /**
          * @brief Randomize the Vertices
@@ -91,9 +101,11 @@ class WaypointList
         /**
          * @brief Create a random waypoint list
          */
-        static WaypointList Create_Random( size_t number_points,
-                                           size_t max_x,
-                                           size_t max_y );
+        static WaypointList Create_Random( size_t       number_points,
+                                           size_t       max_x,
+                                           size_t       max_y,
+                                           const Point& start_point,
+                                           const Point& end_point );
 
         /**
          * @brief Perform Crossover on Waypoint List
@@ -134,6 +146,9 @@ class WaypointList
         size_t m_x_digits;
         size_t m_y_digits;
 
+        Point m_start_point;
+        Point m_end_point;
+
 }; // End of the WaypointList Class
 
 /**
@@ -142,11 +157,15 @@ class WaypointList
  * @param number_points Number of points in the waypoint list
  * @param max_x Max distance needed for easting
  * @param max_y Max distance needed for northing
+ * @param start_point Starting point in normalized coordinates.
+ * @param end_point Ending point in normalized coordinates.
  */
-std::vector<WaypointList> Build_Random_Waypoints( size_t population_size,
-                                                  size_t number_points,
-                                                  size_t max_x,
-                                                  size_t max_y );
+std::vector<WaypointList> Build_Random_Waypoints( size_t       population_size,
+                                                  size_t       number_points,
+                                                  size_t       max_x,
+                                                  size_t       max_y,
+                                                  const Point& start_point,
+                                                  const Point& end_point );
 
 /**
  * @brief Logging-friendly way to print the population list
