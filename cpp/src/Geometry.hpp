@@ -5,6 +5,7 @@
  */
 #pragma once
 
+// C++ Libraries
 #include <array>
 #include <cmath>
 #include <iostream>
@@ -13,6 +14,18 @@
 #include <string>
 #include <vector>
 
+// Boost Geometry
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
+
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(boost::geometry::cs::cartesian)
+
+/**
+ * @class Point
+ * @brief Utility Class for Point Operations
+*/
 template <typename value_type = double>
 class Point
 {
@@ -88,6 +101,16 @@ class Point
         }
 
         /**
+         * @brief Perform Linear Interpolation
+        */
+        static Point<value_type> LERP( const Point<value_type>& pt1, 
+                                       const Point<value_type>& pt2,
+                                       double           ratio )
+        {
+            return (((1-ratio) * pt1) + (ratio * pt2));
+        }
+
+        /**
          * @brief Print to Log-Friendly String
          */
         std::string To_String() const
@@ -117,6 +140,29 @@ Point<TP> operator - ( const Point<TP>& p1, const Point<TP>& p2 )
                       p1.m_data[1] - p2.m_data[1] );
     return output;
 }
+
+/**
+ * @brief Perform Multiplication with a Scalar
+*/
+template <typename TP, typename S>
+Point<TP> operator * ( const Point<TP>& pt, S scalar )
+{
+    Point<TP> output( pt.m_data[0] * scalar,
+                      pt.m_data[1] * scalar );
+    return output;
+}
+
+/**
+ * @brief Perform Multiplication with a Scalar
+*/
+template <typename TP, typename S>
+Point<TP> operator * ( S scalar, const Point<TP>& pt )
+{
+    Point<TP> output( scalar * pt.m_data[0],
+                      scalar * pt.m_data[1] );
+    return output;
+}
+
 
 /**
  * @brief Compute the distance from the point to the line segment
@@ -177,4 +223,67 @@ double Find_Best_Segment_Error( const Point<TP>&              ref_point,
     }
     segment_histogram[segmentId]++;
     return minSegmentDist;
-}                                
+}
+
+/**
+ * @brief March along the line segment, looking for any regions where there are no points present. 
+ *        This will help reduce the impact of switchbacks or other behavior.
+*/
+template <typename TP>
+double Get_Segment_Density( const std::vector<Point<TP>>& vertices,
+                            const std::vector<Point<TP>>& points,
+                            double                        step_distance )
+{
+    double segment_pos = 0;
+    double segment_length = 0;
+    bool point_found = false;
+    double ratio = 0;
+    uint64_t total_steps = 0;
+    uint64_t steps_with_points = 0;
+
+    // For each vertex
+    for( size_t i=0; i<(vertices.size()-1); i++ )
+    {
+        // Reset position info for vertex
+        segment_pos = 0;
+        segment_length = Point<TP>::Distance_L2( vertices[i], 
+                                                 vertices[i+1] );
+
+        // March along segment, one "radius distance" at a time
+        while( true )
+        {
+            // Compute the ratio
+            ratio = segment_pos / segment_length;
+
+            // If the ratio means we have gone past the segment, break free of the while loop
+            if( ratio > 1 )
+            {
+                break;
+            }
+            total_steps++;
+
+            // Perform interpolation
+            auto test_seg_point = Point<TP>::LERP( vertices[i],
+                                                   vertices[i+1],
+                                                   ratio );
+            
+
+            // Look for a single point within distance to this point
+            point_found = false;
+            for( const auto& ref_point : points )
+            {
+                if( Point<TP>::Distance_L2( test_seg_point, ref_point ) < step_distance )
+                {
+                    point_found = true;
+                    steps_with_points++;
+                    break;
+                }
+            }
+
+            // Update segment position
+            segment_pos += step_distance;
+        }
+    }
+
+    return ((double)total_steps / steps_with_points);
+}

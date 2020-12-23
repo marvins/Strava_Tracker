@@ -10,5 +10,5 @@ make
 popd
 
 # Run Route Finder
-./cpp/release/bin/route_finder -d ./bike_data.db -sector_id 1 -i 1000 -pop 3000 -maxw 14 -minw 14
+./cpp/release/bin/route_finder -d ./bike_data.db -sector_id 1 -i 300 -pop 1000 -minw 6 -maxw 14
 

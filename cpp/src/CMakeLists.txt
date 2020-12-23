@@ -6,6 +6,7 @@ add_executable( route_finder
                 route_finder.cpp
                 Accumulator.hpp
                 Blocking_Queue.hpp
+                Context.hpp
                 DB_Point.hpp
                 DB_Point.cpp
                 DB_Utils.hpp

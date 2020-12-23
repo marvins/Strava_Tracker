@@ -5,6 +5,7 @@
  */
 
 // Project Libraries
+#include "Context.hpp"
 #include "DB_Utils.hpp"
 #include "GDAL_Utilities.hpp"
 #include "Genetic_Algorithm.hpp"
@@ -63,8 +64,15 @@ int main( int argc, char* argv[] )
     WaypointList::mutation_func_tp  mutation_algorithm  = WaypointList::Mutation;
     WaypointList::random_func_tp    random_algorithm    = WaypointList::Randomize;
 
-    auto context = reinterpret_cast<void*>( &point_list );
-
+    Context context;
+    context.point_list = point_list;
+    context.density_step_distance = 5;
+    for( const auto& pt : context.point_list )
+    {
+        context.geo_point_list.emplace_back( pt.x_norm, pt.y_norm );
+    }
+    auto context_ptr = reinterpret_cast<void*>( &context );
+    
     // Build Coordinate Transformer
     auto coord_xform = Create_UTM_to_DD_Transformation( options.epsg_code );
 
@@ -75,7 +83,7 @@ int main( int argc, char* argv[] )
     // /////////////////////////////////////////////
     // auto wp1 = WaypointList( "08210299021903430015092402001517010008700195058601241099029719860700234208460033", 10, max_x, max_y );
     // std::cout << "Waypoint 1 (Good)" << std::endl;
-    // wp1.Update_Fitness( context, false );
+    // wp1.Update_Fitness( context_ptr, false );
     // std::cout << wp1.To_String(true) << std::endl;
     // return 0;
     // //////////////////////////////////////////////
@@ -104,7 +112,7 @@ int main( int argc, char* argv[] )
         // Run the GA
         auto population = ga.Run( options.max_iterations,
                                   options.exit_condition,
-                                  context );
+                                  context_ptr );
 
         // Check our results
         BOOST_LOG_TRIVIAL(debug) << "Most Fit Population List, " << Print_Population_List( population, 10 );

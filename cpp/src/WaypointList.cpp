@@ -7,7 +7,7 @@
 
 // Project Libraries
 #include "Accumulator.hpp"
-#include "DB_Point.hpp"
+#include "Context.hpp"
 #include "Geometry.hpp"
 
 // C++ Libraries
@@ -67,36 +67,42 @@ void WaypointList::Update_Fitness( void* context_info,
         return;
     }
 
-    // Cast to the point list
-    auto point_list = *reinterpret_cast<std::vector<DB_Point>*>( context_info );
+    // Cast to the context
+    auto context = *reinterpret_cast<Context*>( context_info );
 
     // Get the vertex list
     auto vertices = Get_Vertices();
 
-    // Map each reference point against it's "best-fit" line-segment
+    // Compute Point-Score:  Map each reference point against it's "best-fit" line-segment
     m_point_score = 0;
     std::map<int,int> segment_histogram;
-    for( const auto& point : point_list )
+    for( const auto& point : context.geo_point_list )
     {
-        m_point_score += Find_Best_Segment_Error( Point( point.x_norm, point.y_norm ), 
+        m_point_score += Find_Best_Segment_Error( point, 
                                                   vertices,
                                                   segment_histogram );
     }
-    // Normalize Fitness
-    m_point_score /= point_list.size();
+    m_point_score /= context.point_list.size();
 
-    m_segment_score = 0;
+    // Compute Length Score
+    m_length_score = 0;
     for( size_t i=0; i<(vertices.size()-1); i++ )
     {
-        m_segment_score += Point<double>::Distance_L2( vertices[i], vertices[i+1] );
+        m_length_score += Point<double>::Distance_L2( vertices[i], vertices[i+1] );
     }
     if( global_min_segment_length < 0 )
     {
-        global_min_segment_length = m_segment_score; 
+        global_min_segment_length = m_length_score; 
     }
-    m_segment_score = 100 * ( m_segment_score / global_min_segment_length );
+    m_length_score = 100 * ( m_length_score / global_min_segment_length );
 
-    m_fitness = m_point_score + m_segment_score;
+    // Compute Density Score
+    const double step_distance = 10;
+    m_density_score = 100 * Get_Segment_Density( vertices,
+                                                 context.geo_point_list,
+                                                 step_distance );
+
+    m_fitness = m_point_score + m_length_score + m_density_score;
 }
 
 /************************************************/
@@ -237,7 +243,10 @@ std::vector<WaypointList> Build_Random_Waypoints( size_t population_size,
 std::string WaypointList::To_String( bool show_vertices ) const
 {
     std::stringstream sout;
-    sout << "DNA: [" << m_dna << "], Points: [" << m_number_points << "] Fitness: [" << std::fixed << m_fitness << "], Point Score: [" << m_point_score << "], Seg Score: [" << m_segment_score << "]";
+    sout << "DNA: [" << m_dna << "], Points: [" << m_number_points << "] Fitness: [" 
+         << std::fixed << m_fitness << "], Point Score: [" << m_point_score 
+         << "], Len Score: [" << m_length_score << "], Density Score: [" 
+         << m_density_score << "]";
     if( show_vertices )
     {
         sout << std::endl;

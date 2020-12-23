@@ -112,14 +112,14 @@ std::vector<DB_Point> Load_Point_List( sqlite3* db, int sector_id )
     std::string sql = "SELECT * FROM point_list ORDER BY timestamp";
     if( sector_id >= 0 )
     {
-        sql = "SELECT * FROM point_list WHERE sectorID=\"" + std::to_string(sector_id) + "\" ORDER BY timestamp";
+        sql = "SELECT * FROM point_list WHERE sectorID=\"sector_" + std::to_string(sector_id) + "\" ORDER BY timestamp";
     }
     char* zErrMsg = 0;
 
     // Make SQL Statement
     std::vector<DB_Point> point_list;
     auto rc = sqlite3_exec( db, sql.c_str(), point_callback, &point_list, &zErrMsg );
-    BOOST_LOG_TRIVIAL(debug) << "Finished loading points";
+    BOOST_LOG_TRIVIAL(debug) << "Finished loading " << point_list.size() << " points. SQL(" + sql + ")";
 
     // Check Errors 
     if( rc != SQLITE_OK )

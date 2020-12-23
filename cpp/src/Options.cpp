@@ -114,6 +114,11 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.ga_config.stats_output_pathname = args.front();
             args.pop_front();
         }
+        if( arg == "-sector_id" )
+        {
+            output.db_sector_id = std::stoi( args.front() );
+            args.pop_front();
+        }
     }
 
     // Check if filesystem exists
