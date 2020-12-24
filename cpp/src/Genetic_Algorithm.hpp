@@ -126,12 +126,51 @@ class Genetic_Algorithm
                         });
                     }
                     auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness ).count()/1000.0;
-                    m_aggregator.Report_Timing( "Fitness Jobs", fitness_time );
+                    m_aggregator.Report_Timing( "Initial Fitness Jobs", fitness_time );
                 }
                 auto fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness ).count()/1000.0;
-                m_aggregator.Report_Timing( "Fitness Full", fitness_time );
+                m_aggregator.Report_Timing( "Initial Fitness Full", fitness_time );
 
-                // Sort the population
+                //////////////////////////////////////////////////////
+                //////////////////////////////////////////////////////
+                // Randomize Unique Entries (No point in crossing-over yourself over and over)
+                auto start_unique = std::chrono::steady_clock::now();
+                std::sort( m_population.begin(), m_population.end() );
+                auto end_of_unique_iter = std::unique( m_population.begin(), m_population.end() );
+
+                // For the duplicates, create random entries
+                for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
+                {
+                    size_t rvidx = rand() % preservation_size;
+                    m_random_algorithm( *end_of_unique_iter );
+                    //m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(),
+                    //                                     iteration );
+                }
+
+                
+                auto unique_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_unique ).count()/1000.0;
+                m_aggregator.Report_Timing( "Unique Full", unique_time );
+
+                // Update Fitness Scores
+                start_fitness = std::chrono::steady_clock::now();
+                {
+                    Thread_Pool pool;
+                    for( auto& member : m_population )
+                    {
+                        pool.enqueue_work([&]() {
+                           member.Update_Fitness( context_info,
+                                                   false,
+                                                   m_aggregator );
+                        });
+                    }
+                    fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness ).count()/1000.0;
+                    m_aggregator.Report_Timing( "Second Fitness Jobs", fitness_time );
+                }
+                m_aggregator.Report_Timing( "Second Fitness Full", fitness_time );
+                //////////////////////////////////////////////////////
+                //////////////////////////////////////////////////////
+
+                // Sort the population one last time
                 std::sort( m_population.begin(), m_population.end() );
 
                 BOOST_LOG_TRIVIAL(debug) << "Iteration: " << iteration << ", Current Best Matches: " << Print_Population_List( m_population, 10 );
