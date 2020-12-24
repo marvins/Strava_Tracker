@@ -106,7 +106,7 @@ double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
     bool point_found = false;
     double ratio = 0;
     uint64_t total_steps = 0;
-    uint64_t steps_with_points = 0;
+    uint64_t steps_with_points = 1;
     std::vector<std::shared_ptr<QTNode>> results;
 
     // For each vertex

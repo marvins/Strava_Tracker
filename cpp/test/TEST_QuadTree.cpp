@@ -42,7 +42,7 @@ TEST( QuadTree, Small_Scale_Usage )
     ASSERT_THROW( qt.Insert( std::make_shared<QTNode>( counter++, ToPoint2D( 11, 9) ) ), std::invalid_argument );
 
     // Query for all nodes inside region
-    BOOST_LOG_TRIVIAL(debug) << qt.To_String();
+    //BOOST_LOG_TRIVIAL(debug) << qt.To_String();
     ASSERT_EQ( qt.Search( ToPoint2D(  0, 0 ), 1.5 ).size(), 4 ); // Test all of the tree
     ASSERT_EQ( qt.Search( ToPoint2D( -8, 6 ), 3 ).size(), 3 ); // Test NW Edge of tree
 }

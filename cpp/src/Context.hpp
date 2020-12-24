@@ -23,7 +23,7 @@ struct Context
     Point end_point;
 
     // Density Step Distance
-    double density_step_distance;
+    double density_step_distance { 25 };
 
     // Quad Tree
     QuadTree<QTNode> point_quad_tree { Rect() };

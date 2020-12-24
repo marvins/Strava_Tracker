@@ -22,6 +22,9 @@
 
 static double global_min_segment_length = -1;
 
+#define USE_POINT_DENSITY 1
+#define USE_SEGMENT_DENSITY 1
+
 /********************************/
 /*          Constructor         */
 /********************************/
@@ -81,6 +84,7 @@ void WaypointList::Update_Fitness( void*             context_info,
     // Compute Point-Score:  Map each reference point against it's "best-fit" line-segment
     auto start_point = std::chrono::steady_clock::now();
     m_point_score = 0;
+#if USE_POINT_DENSITY == 1
     std::map<int,int> segment_histogram;
     for( const auto& point : context.geo_point_list )
     {
@@ -91,6 +95,7 @@ void WaypointList::Update_Fitness( void*             context_info,
     m_point_score /= context.point_list.size();
     auto point_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_point ).count() / 1000.0;
     aggregator.Report_Timing( "Point Density Timing", point_timing );
+#endif 
 
     // Compute Length Score
     m_length_score = 0;
@@ -105,13 +110,15 @@ void WaypointList::Update_Fitness( void*             context_info,
     m_length_score = 100 * ( m_length_score / global_min_segment_length );
 
     // Compute Density Score
-    const double step_distance = 10;
+    m_density_score = 0;
+#if USE_SEGMENT_DENSITY == 1
     auto start_density = std::chrono::steady_clock::now();
     m_density_score = 100 * Get_Segment_Density( vertices,
                                                  context.point_quad_tree,
-                                                 step_distance );
+                                                 context.density_step_distance );
     auto density_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_density ).count() / 1000.0;
-    aggregator.Report_Timing( "Segment Density Timing", density_timing );                                                 
+    aggregator.Report_Timing( "Segment Density Timing", density_timing ); 
+#endif                                                
     
     m_fitness = m_point_score + m_length_score + m_density_score;
 }

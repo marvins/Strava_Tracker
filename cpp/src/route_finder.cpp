@@ -83,13 +83,13 @@ int main( int argc, char* argv[] )
     Rect point_bbox( ToPoint2D( -10, -10 ),
                      std::get<2>(point_range) - std::get<0>(point_range) + 20,
                      std::get<3>(point_range) - std::get<1>(point_range) + 20);
-    int max_objects = 20;
+    int max_objects = 8;
     int max_levels = 10;
 
     // Construct the Context info
     Context context;
     context.point_list = point_list;
-    context.density_step_distance = 5;
+    context.density_step_distance = 25;
     context.start_point = start_point;
     context.end_point   = end_point;
     context.point_quad_tree = QuadTree<QTNode>( point_bbox, max_objects, max_levels );
@@ -99,6 +99,7 @@ int main( int argc, char* argv[] )
         auto node = std::make_shared<QTNode>( pt.index, context.geo_point_list.back() );
         context.point_quad_tree.Insert( node );
     }
+    BOOST_LOG_TRIVIAL(debug) << "Context Created. Step-Distance: " << context.density_step_distance;
     auto context_ptr = reinterpret_cast<void*>( &context );
 
 
@@ -134,6 +135,7 @@ int main( int argc, char* argv[] )
 
         // Check our results
         BOOST_LOG_TRIVIAL(debug) << "Most Fit Population List, " << Print_Population_List( population, 10 );
+        BOOST_LOG_TRIVIAL(debug) << "Best Fit Item: " << population[0].To_String(true);
 
         // Store the results of this run
         std::vector<DB_Point> vertex_point_list;
