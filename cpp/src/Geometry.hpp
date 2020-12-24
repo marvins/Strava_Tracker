@@ -21,6 +21,7 @@
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 // Project Libraries
+#include "QuadTree.hpp"
 #include "Point.hpp"
 
 /**
@@ -97,7 +98,7 @@ double Find_Best_Segment_Error( const Point_<TP,Dims>&              ref_point,
 */
 template <typename TP, size_t Dims>
 double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
-                            const std::vector<Point_<TP,Dims>>& points,
+                            const QuadTree<QTNode>&             quad_tree,
                             double                              step_distance )
 {
     double segment_pos = 0;
@@ -106,6 +107,7 @@ double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
     double ratio = 0;
     uint64_t total_steps = 0;
     uint64_t steps_with_points = 0;
+    std::vector<std::shared_ptr<QTNode>> results;
 
     // For each vertex
     for( size_t i=0; i<(vertices.size()-1); i++ )
@@ -136,14 +138,11 @@ double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
 
             // Look for a single point within distance to this point
             point_found = false;
-            for( const auto& ref_point : points )
+            results = quad_tree.Search( test_seg_point, step_distance );
+            if( results.size() > 0 )
             {
-                if( Point_<TP,Dims>::Distance_L2( test_seg_point, ref_point ) < step_distance )
-                {
-                    point_found = true;
-                    steps_with_points++;
-                    break;
-                }
+                 point_found = true;
+                 steps_with_points++;
             }
 
             // Update segment position

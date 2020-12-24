@@ -11,6 +11,7 @@
 // Project Libraries
 #include "DB_Point.hpp"
 #include "Geometry.hpp"
+#include "QuadTree.hpp"
 
 struct Context
 {
@@ -23,5 +24,8 @@ struct Context
 
     // Density Step Distance
     double density_step_distance;
+
+    // Quad Tree
+    QuadTree<QTNode> point_quad_tree { Rect() };
 
 }; // End of Context Class

@@ -51,6 +51,8 @@ TEST( Geometry, Point_Line_Distance)
 /********************************************************/
 TEST( Geometry, Get_Segment_Density )
 {
+    FAIL();
+    /*
     // Create a list of vertices
     std::vector<Point> vertex_list;
     vertex_list.push_back( ToPoint2D( 0, 0 ) );
@@ -71,4 +73,5 @@ TEST( Geometry, Get_Segment_Density )
     //   - Segment 2-3 should consist of 4 steps
     //   - Segment 3-4 should consist of 2 steps
     ASSERT_NEAR( Get_Segment_Density( vertex_list, test_points, 4 ), 2, 0.1 );
+    */
 }

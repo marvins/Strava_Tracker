@@ -283,6 +283,18 @@ using Point = Point_<double,2>;
 Point ToPoint2D( double x, double y );
 
 /**
+ * @brief Create a 2D Point
+*/
+template <typename TP>
+Point_<TP,2> ToPoint2( TP x, TP y )
+{
+    auto p = Point_<TP,2>();
+    p.m_data[0] = x;
+    p.m_data[1] = y;
+    return p;
+}
+
+/**
  * @brief Add 2 points
 */
 template <typename TP, size_t Dims>

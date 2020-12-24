@@ -105,16 +105,15 @@ void WaypointList::Update_Fitness( void*             context_info,
     m_length_score = 100 * ( m_length_score / global_min_segment_length );
 
     // Compute Density Score
-    /*
     const double step_distance = 10;
     auto start_density = std::chrono::steady_clock::now();
     m_density_score = 100 * Get_Segment_Density( vertices,
-                                                 context.geo_point_list,
+                                                 context.point_quad_tree,
                                                  step_distance );
     auto density_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_density ).count() / 1000.0;
     aggregator.Report_Timing( "Segment Density Timing", density_timing );                                                 
-    */
-    m_fitness = m_point_score + m_length_score;// + m_density_score;
+    
+    m_fitness = m_point_score + m_length_score + m_density_score;
 }
 
 /************************************************/

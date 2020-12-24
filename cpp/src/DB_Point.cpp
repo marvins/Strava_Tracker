@@ -16,7 +16,7 @@
 std::string DB_Point::To_String() const
 {
     std::stringstream sout;
-    sout << "Point" << std::endl;
+    sout << "Point.  index: " << index << std::endl;
     sout << "  - Latitude: " << std::fixed << latitude << std::endl;
     sout << "  - Longitude: " << std::fixed << longitude << std::endl;
     sout << "  - GridZone: " << gz << std::endl;

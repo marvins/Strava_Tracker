@@ -79,15 +79,25 @@ int main( int argc, char* argv[] )
                      - ToPoint2D( std::get<0>(point_range), std::get<1>(point_range) );
     BOOST_LOG_TRIVIAL(debug) << "Starting Point: " << start_point.To_String() << ", Ending Point: " << end_point.To_String();
     
+    // Create Quad Tree
+    Rect point_bbox( ToPoint2D( -10, -10 ),
+                     std::get<2>(point_range) - std::get<0>(point_range) + 20,
+                     std::get<3>(point_range) - std::get<1>(point_range) + 20);
+    int max_objects = 20;
+    int max_levels = 10;
+
     // Construct the Context info
     Context context;
     context.point_list = point_list;
     context.density_step_distance = 5;
     context.start_point = start_point;
     context.end_point   = end_point;
+    context.point_quad_tree = QuadTree<QTNode>( point_bbox, max_objects, max_levels );
     for( const auto& pt : context.point_list )
     {
         context.geo_point_list.push_back( ToPoint2D( pt.x_norm, pt.y_norm ) );
+        auto node = std::make_shared<QTNode>( pt.index, context.geo_point_list.back() );
+        context.point_quad_tree.Insert( node );
     }
     auto context_ptr = reinterpret_cast<void*>( &context );
 

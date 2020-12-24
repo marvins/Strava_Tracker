@@ -9,10 +9,16 @@ add_executable( route_finder_tests
                 TEST_Geometry.cpp
                 TEST_KML_Writer.cpp
                 TEST_Point.cpp
+                TEST_QuadTree.cpp
+                TEST_Rect.cpp
                 TEST_Thread_Pool.cpp
                 TEST_WaypointList.cpp
                 ../src/Accumulator.hpp
                 ../src/Blocking_Queue.hpp
+                ../src/DB_Point.hpp
+                ../src/DB_Point.cpp
+                ../src/DB_Utils.hpp
+                ../src/DB_Utils.cpp
                 ../src/GDAL_Utilities.hpp
                 ../src/GDAL_Utilities.cpp
                 ../src/Geometry.hpp
@@ -20,6 +26,8 @@ add_executable( route_finder_tests
                 ../src/KML_Writer.cpp
                 ../src/Point.hpp
                 ../src/Point.cpp
+                ../src/QuadTree.hpp
+                ../src/Rect.hpp
                 ../src/Stats_Aggregator.hpp
                 ../src/Stats_Aggregator.cpp
                 ../src/Thread_Pool.hpp

@@ -25,6 +25,8 @@ add_executable( route_finder
                 Options.cpp
                 Point.hpp
                 Point.cpp
+                QuadTree.hpp
+                Rect.hpp
                 Stats_Aggregator.hpp
                 Stats_Aggregator.cpp
                 Thread_Pool.hpp

@@ -21,6 +21,7 @@ class DB_Point
         std::string To_String()const;
 
         // Database Fields
+        size_t index;
         double latitude;
         double longitude;
         int    gz;

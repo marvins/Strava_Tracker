@@ -44,6 +44,10 @@ static int point_callback( void *data, int argc, char **argv, char **azColName )
         {
 
         }
+        else if( azColName[i] == std::string("index") )
+        {
+            new_point.index = std::stoi( argv[i] );
+        }
         else if( azColName[i] == std::string("latitude") )
         {
             new_point.latitude = std::stod( argv[i] );
