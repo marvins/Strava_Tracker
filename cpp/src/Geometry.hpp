@@ -132,8 +132,8 @@ double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
 
             // Perform interpolation
             auto test_seg_point = Point_<TP,Dims>::LERP( vertices[i],
-                                                   vertices[i+1],
-                                                   ratio );
+                                                         vertices[i+1],
+                                                         ratio );
             
 
             // Look for a single point within distance to this point

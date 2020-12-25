@@ -64,8 +64,9 @@ class Genetic_Algorithm
                 // Capture a log of the configuration structure as this is really important
                 std::stringstream sout;
                 sout << "Population Size   : " << m_population.size() << std::endl;
-                sout << "Preservation Size : " << preservation_size << std::endl;
-                sout << "Selection Size    : " << selection_size << std::endl;
+                sout << "Preservation Size : " << preservation_size << ", Rate: " << m_config.preservation_rate << std::endl;
+                sout << "Selection Size    : " << selection_size << ", Rate: " << m_config.selection_rate << std::endl;
+                sout << "Mutation Size     : " << mutation_size << ", Rate: " << m_config.mutation_rate << std::endl;
                 sout << "Crossover Size    : " << m_population.size() - (preservation_size + selection_size) << std::endl;
                 BOOST_LOG_TRIVIAL(debug) << sout.str();
             }
@@ -134,15 +135,17 @@ class Genetic_Algorithm
                 // For the duplicates, create random entries
                 for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
                 {
-                    if( rand()%2 == 0 )
+                    m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(), 
+                                                         iteration );
+                    //if( rand()%2 == 0 )
                     {
                         m_random_algorithm( *end_of_unique_iter );
                     }
-                    else
-                    {
-                        size_t rvidx = rand() % preservation_size;
-                        end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
-                    }
+                    //else
+                    //{
+                    //    size_t rvidx = rand() % preservation_size;
+                    //    end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
+                    //}
                 }
 
                 

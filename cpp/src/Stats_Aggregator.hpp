@@ -42,6 +42,12 @@ class Stats_Aggregator
                                         double   iteration_time_ms );
 
         /**
+         * @brief Report a duplicate entry.
+         */
+        void Report_Duplicate_Entry( size_t   num_waypoints,
+                                     size_t   iteration_number );
+
+        /**
          * @brief Writing Stats Data to File
          */
         void Write_Stats_Info( const std::string& output_pathname,
@@ -55,5 +61,8 @@ class Stats_Aggregator
 
         /// Iteration Information
         std::map<size_t,std::map<size_t,std::tuple<double,double>>> m_iteration_info;
+
+        /// Duplicate Tracker
+        std::map<size_t,std::map<size_t,size_t>> m_duplicate_info;
 
 }; // End of Stats_Aggregator Class

@@ -24,7 +24,7 @@
 static double global_min_segment_length = -1;
 
 #define USE_POINT_DENSITY 1
-#define USE_SEGMENT_DENSITY 1
+#define USE_SEGMENT_DENSITY 0
 
 /********************************/
 /*          Constructor         */
