@@ -29,29 +29,22 @@ class Genetic_Algorithm
          * @param config Configuration of the GA
          * @param population Initial population sample
          */
-        Genetic_Algorithm( GA_Config                                  config,
-                           std::vector<Phenotype>                     population,
+        Genetic_Algorithm( GA_Config                                     config,
+                           std::vector<Phenotype>                        population,
                            std::function<Phenotype(const Phenotype&, 
-                                                   const Phenotype&)> crossover_algorithm,
-                           std::function<void(Phenotype&)>            mutation_algorithm,
-                           std::function<void(Phenotype&)>            random_algorithm,
-                           bool                                       append_stats )
+                                                   const Phenotype&)>    crossover_algorithm,
+                           std::function<void(Phenotype&)>               mutation_algorithm,
+                           std::function<void(Phenotype&)>               random_algorithm,
+                           std::function<void(const Phenotype&, size_t)> write_worker,
+                           bool                                          append_stats )
           : m_config( config ),
             m_population(population),
             m_crossover_algorithm(crossover_algorithm),
             m_mutation_algorithm(mutation_algorithm),
             m_random_algorithm(random_algorithm),
+            m_write_worker(write_worker),
             m_append_stats(append_stats)
         {
-        }
-
-        /**
-         * @brief Destructor
-         */
-        virtual ~Genetic_Algorithm()
-        {
-            m_aggregator.Write_Stats_Info( m_config.stats_output_pathname,
-                                           m_append_stats );
         }
 
         /**
@@ -141,10 +134,15 @@ class Genetic_Algorithm
                 // For the duplicates, create random entries
                 for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
                 {
-                    size_t rvidx = rand() % preservation_size;
-                    m_random_algorithm( *end_of_unique_iter );
-                    //m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(),
-                    //                                     iteration );
+                    if( rand()%2 == 0 )
+                    {
+                        m_random_algorithm( *end_of_unique_iter );
+                    }
+                    else
+                    {
+                        size_t rvidx = rand() % preservation_size;
+                        end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
+                    }
                 }
 
                 
@@ -181,11 +179,18 @@ class Genetic_Algorithm
                                                         m_population.front().Get_Fitness(),
                                                         iter_time_ms.count()/1000.0 );
 
+                // Write Stats Data
+                m_aggregator.Write_Stats_Info( m_config.stats_output_pathname,
+                                               m_append_stats );
+
                 // Check Exit Condition
                 if( exit_condition->Check_Exit( m_population.front().Get_Fitness() ) )
                 {
                     break;
                 }
+
+                // Write Latest Results
+                m_write_worker( m_population.front(), iteration );
             }
             return m_population;
         }
@@ -206,6 +211,9 @@ class Genetic_Algorithm
 
         // Random Algorithm
         std::function<void(Phenotype&)> m_random_algorithm;
+
+        // Intermediate Write Worker
+        std::function<void(const Phenotype&, size_t)> m_write_worker;
 
         // Stats Aggregation Class
         Stats_Aggregator m_aggregator;

@@ -31,7 +31,9 @@ add_executable( route_finder
                 Stats_Aggregator.cpp
                 Thread_Pool.hpp
                 WaypointList.hpp
-                WaypointList.cpp )
+                WaypointList.cpp
+                Write_Worker.hpp
+                Write_Worker.cpp )
 
 target_link_libraries( route_finder
                        SQLite::SQLite3

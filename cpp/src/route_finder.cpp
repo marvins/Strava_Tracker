@@ -12,14 +12,13 @@
 #include "KML_Writer.hpp"
 #include "Options.hpp"
 #include "WaypointList.hpp"
-
-// C++ Libraries
-#include <cmath>
-#include <iostream>
-#include <fstream>
+#include "Write_Worker.hpp"
 
 // Boost Libraries
 #include <boost/log/trivial.hpp>
+
+using namespace std::placeholders;
+
 
 int main( int argc, char* argv[] )
 {
@@ -59,6 +58,7 @@ int main( int argc, char* argv[] )
     BOOST_LOG_TRIVIAL(debug) << "X Digits: " << x_digits << ", Y Digits: " << y_digits;
     BOOST_LOG_TRIVIAL(debug) << "Min: [" << std::get<0>(point_range) << ", " << std::get<1>(point_range) 
                              << "], Max: [" << std::get<2>(point_range) << ", " << std::get<3>(point_range) << "]"; 
+
     // Define our mutation and crossover algorithms
     WaypointList::crossover_func_tp crossover_algorithm = WaypointList::Crossover;
     WaypointList::mutation_func_tp  mutation_algorithm  = WaypointList::Mutation;
@@ -106,18 +106,44 @@ int main( int argc, char* argv[] )
     // Master List of Vertices
     std::map<int,std::vector<DB_Point>> master_vertex_list;
 
+    // Input population data (if requested)
+    std::map<int,std::vector<WaypointList>> loaded_population;
+    if( options.load_population_data )
+    {
+        loaded_population = Load_Population( options.population_path,
+                                             options.min_waypoints,
+                                             options.max_waypoints,
+                                             options.population_size );
+    }
+
+    // Create the file writing information
+    auto writer_obj = std::make_shared<Write_Worker>( xform_utm2dd,
+                                                      point_range,
+                                                      point_list.front().gz,
+                                                      master_vertex_list );
+    std::function<void(const WaypointList&, size_t)> write_worker = std::bind( &Write_Worker::Write, writer_obj, _1, _2 );
+
     // Iterate over each waypoint count
     for( int num_waypoints = options.min_waypoints; 
          num_waypoints <= options.max_waypoints;
          num_waypoints++ )
     {
         // Build the initial population
-        std::vector<WaypointList> initial_population = Build_Random_Waypoints( options.population_size,
-                                                                               num_waypoints,
-                                                                               max_x, max_y,
-                                                                               start_point,
-                                                                               end_point );
+        std::vector<WaypointList> initial_population;
+        if( !options.load_population_data )
+        {
+            initial_population = Build_Random_Waypoints( options.population_size,
+                                                         num_waypoints,
+                                                         max_x, max_y,
+                                                         start_point,
+                                                         end_point );
+        }
+        else
+        {
+            initial_population = loaded_population[num_waypoints];
+        }
         
+        // Load the population list
         BOOST_LOG_TRIVIAL(debug) << "Initial Population List, " << Print_Population_List( initial_population, 10 );
 
         // Construct Genetic Algorithm
@@ -126,6 +152,7 @@ int main( int argc, char* argv[] )
                                             crossover_algorithm,
                                             mutation_algorithm,
                                             random_algorithm,
+                                            write_worker,
                                             (num_waypoints != options.min_waypoints) );
 
         // Run the GA
@@ -137,46 +164,10 @@ int main( int argc, char* argv[] )
         BOOST_LOG_TRIVIAL(debug) << "Most Fit Population List, " << Print_Population_List( population, 10 );
         BOOST_LOG_TRIVIAL(debug) << "Best Fit Item: " << population[0].To_String(true);
 
-        // Store the results of this run
-        std::vector<DB_Point> vertex_point_list;
-        auto vertices = population.front().Get_Vertices();
-        for( auto& v : vertices )
-        {
-            DB_Point new_point;
+        write_worker( population[0], options.max_iterations );  
 
-            // Add the UTM offsets
-            v += ToPoint2D( std::get<0>(point_range), std::get<1>(point_range) );
-            new_point.gz       = point_list.front().gz;
-            new_point.easting  = v.x();
-            new_point.northing = v.y();
-
-            new_point.x_norm = population.front().Get_Fitness();
-
-            // Convert to Geographic
-            auto temp_lla = Convert_Coordinate( xform_utm2dd, v );
-            new_point.latitude  = temp_lla.m_data[0];
-            new_point.longitude = temp_lla.m_data[1];
-            vertex_point_list.push_back( new_point );
-        }
-        master_vertex_list[num_waypoints] = vertex_point_list;
-
-        // Write Latest Results
-        std::ofstream fout;
-        fout.open("waypoints.csv");
-        fout << "NumWaypoints,Fitness,GridZone,Easting,Northing,Latitude,Longitude" << std::endl;
-        for( const auto& num : master_vertex_list )
-        {
-            std::cerr << "Writing vertices for " << num.first << " points" << std::endl;
-            for( const auto& point : num.second )
-            {
-                fout << std::fixed << num.first << "," << point.x_norm << "," 
-                     << point.gz << "," << point.easting << "," << point.northing 
-                     << "," << point.latitude << "," << point.longitude << std::endl;
-            }
-        }
-        fout.close();
-
-        Write_KML( "waypoints.kml", master_vertex_list );    
+        // Write the population data to disk
+        Write_Population( population, options.population_path, true );
     
     } // End of Waypoint Number Loop
 

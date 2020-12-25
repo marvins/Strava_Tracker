@@ -6,6 +6,7 @@
 #pragma once
 
 // C++ Libraries
+#include <filesystem>
 #include <functional>
 #include <string>
 #include <vector>
@@ -56,6 +57,11 @@ class WaypointList
         }
 
         /**
+         * @brief Get the DNA String
+         */
+        std::string Get_DNA() const;
+
+        /**
          * @brief Get the Fitness Score
          */
         double Get_Fitness() const;
@@ -73,6 +79,26 @@ class WaypointList
                              bool              check_fitness,
                              Stats_Aggregator& aggregator );
 
+        /**
+         * @brief Get the Max X Value
+         */
+        size_t Get_Max_X() const;
+
+        /**
+         * @brief Get the Max Y Value
+         */
+        size_t Get_Max_Y() const;
+
+        /**
+         * @brief Get the Starting Point
+         */
+        Point Get_Start_Point() const;
+
+        /**
+         * @brief Get the Ending Point
+         */
+        Point Get_End_Point() const;
+        
         /**
          * @brief Get the vertices from the dna strand
          */
@@ -173,3 +199,18 @@ std::vector<WaypointList> Build_Random_Waypoints( size_t       population_size,
  */
 std::string Print_Population_List( const std::vector<WaypointList>& population,
                                    size_t                           max_values = 0 );
+
+/**
+ * @brief Write the population data to disk
+ */
+void Write_Population( const std::vector<WaypointList>& population,
+                       const std::filesystem::path&     output_path,
+                       bool                             append_to_file );
+
+/**
+ * @brief Load the population file.
+ */
+std::map<int,std::vector<WaypointList>> Load_Population( const std::filesystem::path& input_pathname,
+                                                         size_t                       min_waypoints,
+                                                         size_t                       max_waypoints,
+                                                         size_t                       population_size );

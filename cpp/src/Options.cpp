@@ -138,6 +138,12 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.end_longitude = std::stod( args.front() );
             args.pop_front();
         }
+        if( arg == "-input" )
+        {
+            output.load_population_data = true;
+            output.population_path = std::filesystem::path( args.front());
+            args.pop_front();
+        }
     }   
 
     // Check if filesystem exists
@@ -202,6 +208,9 @@ void Usage( const Options& options )
     sin << "       - Default: " << options.db_sector_id << std::endl;
     sin << "   -nt <int>    : Number of threads to use in the population fitness update." << std::endl;
     sin << "       - Default: " << options.number_threads << std::endl;
+    sin << "   -input <path> : Load the initial population data from disk." << std::endl;
+    sin << "       - Default behavior is to randomly generate a population." << std::endl;
+    sin << "         Too few entries will result in the remaining entries being randomly created." << std::endl;
     sin << std::endl;
     BOOST_LOG_TRIVIAL(warning) << sin.str();
     std::exit(-1);

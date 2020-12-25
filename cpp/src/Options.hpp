@@ -6,6 +6,7 @@
 #pragma once
 
 // C++ Libraries
+#include <filesystem>
 #include <map>
 #include <string>
 
@@ -22,7 +23,7 @@ struct Options
     std::string program_name;
 
     // Database Name
-    std::string db_path;
+    std::filesystem::path db_path;
 
     // Database Sector-ID
     int db_sector_id { -1 };
@@ -57,12 +58,20 @@ struct Options
     double end_longitude { 0 };
 
     // GA Fields
-    double preservation_rate { 0.01 };
-    double selection_rate { 0.5 };
-    double mutation_rate { 0.7 };
+    double preservation_rate { 0.05 };
+    double selection_rate { 0.4 };
+    double mutation_rate { 0.8 };
     double random_vert_rate { 0.05 };
 
+    // Application Overhead
     int number_threads = 10;
+
+    // Flag if we want to load the population data rather than randomly generate
+    bool load_population_data { false };
+
+    //Path to the population file we'll write on close
+    std::filesystem::path population_path { "./population.csv" };
+
 
 }; // End of Options Class
 

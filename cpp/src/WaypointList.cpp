@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -46,6 +47,14 @@ WaypointList::WaypointList( std::string  dna,
 {
 }
 
+/****************************************/
+/*          Get the DNA String          */
+/****************************************/
+std::string WaypointList::Get_DNA() const
+{
+    return m_dna;
+}
+
 /********************************************/
 /*          Get the Fitness Value           */
 /********************************************/
@@ -69,6 +78,8 @@ void WaypointList::Update_Fitness( void*             context_info,
                                    bool              check_fitness,
                                    Stats_Aggregator& aggregator )
 {
+    auto start_method = std::chrono::steady_clock::now();
+
     // Skip everything if the fitness is still valid
     if( check_fitness && m_fitness >= 0 )
     {
@@ -93,7 +104,7 @@ void WaypointList::Update_Fitness( void*             context_info,
                                                   segment_histogram );
     }
     m_point_score /= context.point_list.size();
-    auto point_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_point ).count() / 1000.0;
+    auto point_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_point ).count() / 1000000.0;
     aggregator.Report_Timing( "Point Density Timing", point_timing );
 #endif 
 
@@ -116,11 +127,45 @@ void WaypointList::Update_Fitness( void*             context_info,
     m_density_score = 100 * Get_Segment_Density( vertices,
                                                  context.point_quad_tree,
                                                  context.density_step_distance );
-    auto density_timing = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_density ).count() / 1000.0;
+    auto density_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_density ).count() / 1000000.0;
     aggregator.Report_Timing( "Segment Density Timing", density_timing ); 
 #endif                                                
     
     m_fitness = m_point_score + m_length_score + m_density_score;
+    auto method_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_method ).count() / 1000000.0;
+    aggregator.Report_Timing( "Fitness Method Timing", method_timing );
+}
+
+/****************************************/
+/*          Get the Max X Value         */
+/****************************************/
+size_t WaypointList::Get_Max_X() const
+{
+    return m_max_x;
+}
+
+/****************************************/
+/*          Get the Max Y Value         */
+/****************************************/
+size_t WaypointList::Get_Max_Y() const
+{
+    return m_max_y;
+}
+
+/****************************************/
+/*          Get the Start Point         */
+/****************************************/
+Point WaypointList::Get_Start_Point() const
+{
+    return m_start_point;
+}
+
+/**************************************/
+/*          Get the End Point         */
+/**************************************/
+Point WaypointList::Get_End_Point() const
+{
+    return m_end_point;
 }
 
 /************************************************/
@@ -310,4 +355,46 @@ std::string Print_Population_List( const std::vector<WaypointList>& population,
         sout << "  " << i << " -> " << population[i].To_String() << std::endl;
     }
     return sout.str(); 
+}
+
+/************************************************/
+/*          Write the Population Data           */
+/************************************************/
+void Write_Population( const std::vector<WaypointList>& population,
+                       const std::filesystem::path&     output_path,
+                       bool                             append_to_file )
+{
+    // Open the file
+    std::ofstream fout;
+    if( append_to_file )
+    {
+        fout.open( output_path, std::ios_base::app );
+    }
+    else
+    {
+        fout.open( output_path );
+    }
+    
+    fout << "num_waypoints,population,dna,max_x,max_y,start_point_lat,start_point_lon,end_point_lat,end_point_lon,fitness" << std::endl;
+    for( size_t i=0; i<population.size(); i++ )
+    {
+        fout << population[i].Get_Number_Waypoint() << "," << i << "," << population[i].Get_DNA() << ",";
+        fout << population[i].Get_Max_X() << "," << population[i].Get_Max_Y() << ",";
+        fout << population[i].Get_Start_Point().y() << "," << population[i].Get_Start_Point().x();
+        fout << "," << population[i].Get_End_Point().x() << "," << population[i].Get_End_Point().y() << std::endl;
+    }    
+
+    // Close the file
+    fout.close();
+}
+
+/************************************************/
+/*          Load the Population Data            */
+/************************************************/
+std::map<int,std::vector<WaypointList>> Load_Population( const std::filesystem::path& input_pathname,
+                                                         size_t                       min_waypoints,
+                                                         size_t                       max_waypoints,
+                                                         size_t                       population_size )
+{
+    throw std::runtime_error("Not implemented yet.");
 }
