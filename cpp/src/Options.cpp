@@ -144,6 +144,11 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.population_path = std::filesystem::path( args.front());
             args.pop_front();
         }
+        if( arg == "-seed_id" )
+        {
+            output.seed_dataset_id = std::stoi( args.front() );
+            args.pop_front();
+        }
     }   
 
     // Check if filesystem exists
@@ -211,6 +216,9 @@ void Usage( const Options& options )
     sin << "   -input <path> : Load the initial population data from disk." << std::endl;
     sin << "       - Default behavior is to randomly generate a population." << std::endl;
     sin << "         Too few entries will result in the remaining entries being randomly created." << std::endl;
+    sin << "   -seed_id <int> : Initial dataset-id to use for seeding the initial population." << std::endl;
+    sin << "                    If id < 0, then random numbers shall be used.  Also, using an input path will override this." << std::endl;
+    sin << "       - Default: " << options.seed_dataset_id << std::endl;
     sin << std::endl;
     BOOST_LOG_TRIVIAL(warning) << sin.str();
     std::exit(-1);

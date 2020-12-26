@@ -115,6 +115,27 @@ int main( int argc, char* argv[] )
                                              options.max_waypoints,
                                              options.population_size );
     }
+    else if( options.seed_dataset_id >= 0 )
+    {
+        auto dataset_points = Load_Point_List( db, options.db_sector_id, options.seed_dataset_id );
+
+        // Normalize
+        Normalize_Points( dataset_points, 
+                          std::get<0>(point_range),
+                          std::get<1>(point_range) );
+        std::vector<Point> dpoints;
+        for( const auto& pt : dataset_points )
+        {
+            dpoints.push_back( ToPoint2D( pt.x_norm, pt.y_norm ) );
+        }
+        loaded_population = Seed_Population( dpoints,
+                                             options.min_waypoints,
+                                             options.max_waypoints,
+                                             options.population_size,
+                                             max_x, max_y, 
+                                             start_point,
+                                             end_point );
+    }
 
     // Create the file writing information
     auto writer_obj = std::make_shared<Write_Worker>( xform_utm2dd,
@@ -130,7 +151,7 @@ int main( int argc, char* argv[] )
     {
         // Build the initial population
         std::vector<WaypointList> initial_population;
-        if( !options.load_population_data )
+        if( !loaded_population.empty() )
         {
             initial_population = Build_Random_Waypoints( options.population_size,
                                                          num_waypoints,

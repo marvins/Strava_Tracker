@@ -49,6 +49,15 @@ class WaypointList
                       const Point& end_point );
 
         /**
+         * @brief Create a WaypointList from normalized vertices.
+         */
+        WaypointList( const std::vector<Point>& waypoints,
+                      size_t                    max_x,
+                      size_t                    max_y,
+                      const Point&              start_point,
+                      const Point&              end_point );
+
+        /**
          * @brief Get the Number of Waypoints
          */
         size_t Get_Number_Waypoint() const
@@ -77,7 +86,8 @@ class WaypointList
          */
         void Update_Fitness( void*             context_info,
                              bool              check_fitness,
-                             Stats_Aggregator& aggregator );
+                             Stats_Aggregator& aggregator,
+                             double            new_min_seg_length = -1 );
 
         /**
          * @brief Get the Max X Value
@@ -214,3 +224,14 @@ std::map<int,std::vector<WaypointList>> Load_Population( const std::filesystem::
                                                          size_t                       min_waypoints,
                                                          size_t                       max_waypoints,
                                                          size_t                       population_size );
+/**
+ * @brief Seed the population file.
+ */
+std::map<int,std::vector<WaypointList>> Seed_Population( const std::vector<Point>& dataset_points,
+                                                         size_t                    min_waypoints,
+                                                         size_t                    max_waypoints,
+                                                         size_t                    population_size,
+                                                         size_t                    max_x,
+                                                         size_t                    max_y,
+                                                         const Point&              start_point,
+                                                         const Point&              end_point );

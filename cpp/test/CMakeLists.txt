@@ -5,6 +5,7 @@
 add_executable( route_finder_tests
                 route_finder_test.cpp
                 TEST_Accumulator.cpp
+                TEST_DB_Utils.cpp
                 TEST_GDAL_Utilities.cpp
                 TEST_Geometry.cpp
                 TEST_KML_Writer.cpp
@@ -13,6 +14,8 @@ add_executable( route_finder_tests
                 TEST_Rect.cpp
                 TEST_Thread_Pool.cpp
                 TEST_WaypointList.cpp
+                Utilities.hpp
+                Utilities.cpp
                 ../src/Accumulator.hpp
                 ../src/Blocking_Queue.hpp
                 ../src/DB_Point.hpp

@@ -41,4 +41,6 @@ class DB_Point
  * @brief Normalize the Point Range
  * @return [minX,minY,maxX,maxY]
  */
-std::tuple<int,int,int,int> Normalize_Points( std::vector<DB_Point>& point_list );
+std::tuple<int,int,int,int> Normalize_Points( std::vector<DB_Point>& point_list,
+                                              int                    min_x = -1,
+                                              int                    min_y = -1 );

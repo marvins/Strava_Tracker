@@ -137,15 +137,15 @@ class Genetic_Algorithm
                 {
                     m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(), 
                                                          iteration );
-                    //if( rand()%2 == 0 )
+                    if( rand()%4 < 3 )
                     {
                         m_random_algorithm( *end_of_unique_iter );
                     }
-                    //else
-                    //{
-                    //    size_t rvidx = rand() % preservation_size;
-                    //    end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
-                    //}
+                    else
+                    {
+                        size_t rvidx = rand() % selectionStopIdx;
+                        end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
+                    }
                 }
 
                 

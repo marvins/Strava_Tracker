@@ -14,17 +14,22 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <random>
+#include <set>
 #include <sstream>
+
+// Boost Libraries
+#include <boost/log/trivial.hpp>
 
 static double global_min_segment_length = -1;
 
 #define USE_POINT_DENSITY 1
-#define USE_SEGMENT_DENSITY 0
+#define USE_SEGMENT_DENSITY 1
 
 /********************************/
 /*          Constructor         */
@@ -45,6 +50,32 @@ WaypointList::WaypointList( std::string  dna,
    m_start_point(start_point),
    m_end_point(end_point)
 {
+}
+
+/********************************/
+/*          Constructor         */
+/********************************/
+WaypointList::WaypointList( const std::vector<Point>& waypoints,
+                            size_t                    max_x,
+                            size_t                    max_y,
+                            const Point&              start_point,
+                            const Point&              end_point )
+ : m_fitness( -1 ),
+   m_number_points(waypoints.size()),
+   m_max_x(max_x),
+   m_max_y(max_y),
+   m_x_digits(log10(max_x) + 1),
+   m_y_digits(log10(max_y) + 1),
+   m_start_point(start_point),
+   m_end_point(end_point)
+{
+    std::stringstream dna;
+    for( size_t i=0; i<m_number_points; i++ )
+    {
+        dna << std::setfill('0') << std::setw(m_x_digits) << (int)waypoints[i].x();
+        dna << std::setfill('0') << std::setw(m_y_digits) << (int)waypoints[i].y();
+    }
+    m_dna = dna.str();
 }
 
 /****************************************/
@@ -76,7 +107,8 @@ void WaypointList::Set_Fitness( double fitness )
 /************************************************************************/
 void WaypointList::Update_Fitness( void*             context_info,
                                    bool              check_fitness,
-                                   Stats_Aggregator& aggregator )
+                                   Stats_Aggregator& aggregator,
+                                   double            new_min_seg_length )
 {
     auto start_method = std::chrono::steady_clock::now();
 
@@ -114,9 +146,14 @@ void WaypointList::Update_Fitness( void*             context_info,
     {
         m_length_score += Point::Distance_L2( vertices[i], vertices[i+1] );
     }
-    if( global_min_segment_length < 0 )
+    if( new_min_seg_length > 0 )
+    {
+        global_min_segment_length = new_min_seg_length;
+    }
+    else if( global_min_segment_length < 0 )
     {
         global_min_segment_length = m_length_score; 
+        BOOST_LOG_TRIVIAL(debug) << "Global-Min-Segment-Length: " << global_min_segment_length << " meters";
     }
     m_length_score = 100 * ( m_length_score / global_min_segment_length );
 
@@ -237,8 +274,8 @@ WaypointList WaypointList::Create_Random( size_t       number_points,
     std::stringstream dna;
     for( size_t i=0; i<number_points; i++ )
     {
-        dna << std::setfill('0') << std::setw(x_digits) << rand() % max_x;
-        dna << std::setfill('0') << std::setw(y_digits) << rand() % max_y;
+        dna << std::setfill('0') << std::setw(x_digits) << (rand() % max_x);
+        dna << std::setfill('0') << std::setw(y_digits) << (rand() % max_y);
     }
 
     return WaypointList( dna.str(), 
@@ -397,4 +434,62 @@ std::map<int,std::vector<WaypointList>> Load_Population( const std::filesystem::
                                                          size_t                       population_size )
 {
     throw std::runtime_error("Not implemented yet.");
+}
+
+/***********************************************/
+/*          Seed the population file.          */
+/***********************************************/
+std::map<int,std::vector<WaypointList>> Seed_Population( const std::vector<Point>& dataset_points,
+                                                         size_t                    min_waypoints,
+                                                         size_t                    max_waypoints,
+                                                         size_t                    population_size,
+                                                         size_t                    max_x,
+                                                         size_t                    max_y,
+                                                         const Point&              start_point,
+                                                         const Point&              end_point )
+{
+    std::map<int,std::vector<WaypointList>> output;
+
+    // Iterate over the waypoint range
+    for( size_t wp = min_waypoints; wp <= max_waypoints; wp++ )
+    {
+        output[wp] = std::vector<WaypointList>();
+        for( size_t pop_id=0; pop_id < population_size; pop_id++ )
+        {
+            // Create a vertex list from a distribution of the points
+            std::vector<Point> vertex_list;
+            if( wp == 0 ) // Just to be safe, use an even distribution on the first entry
+            {
+                for( size_t x=0; x<wp; x++ )
+                {
+                    size_t tidx = std::min( dataset_points.size()-1, 
+                                            std::max( (size_t)0, (size_t)std::round( x * ((double)wp / dataset_points.size()))));
+                    vertex_list.push_back( dataset_points[tidx] );
+                }
+            }
+            else
+            {
+                // Create a random list of indeces and load into a set (sets filter duplicates and auto-sort)
+                std::set<size_t> idx_list;
+                while( idx_list.size() < wp )
+                {
+                    idx_list.insert( rand() % dataset_points.size() );
+                }
+
+                // Build the points
+                for( const auto& tidx : idx_list )
+                {
+                    vertex_list.push_back( dataset_points[tidx] );
+                }
+            }
+
+            output[wp].emplace_back( vertex_list,
+                                     max_x,
+                                     max_y,
+                                     start_point,
+                                     end_point );
+        }
+    }
+
+    return output;
 }

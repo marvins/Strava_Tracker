@@ -110,14 +110,27 @@ std::vector<std::string>  Load_Sector_IDs( sqlite3 *db )
 /****************************************/
 /*          Loading Point List          */
 /****************************************/
-std::vector<DB_Point> Load_Point_List( sqlite3* db, int sector_id )
+std::vector<DB_Point> Load_Point_List( sqlite3* db, int sector_id, int dataset_id )
 {
     // Create Statement
-    std::string sql = "SELECT * FROM point_list ORDER BY timestamp";
+    std::string sql = "SELECT * FROM point_list";
     if( sector_id >= 0 )
     {
-        sql = "SELECT * FROM point_list WHERE sectorID=\"sector_" + std::to_string(sector_id) + "\" ORDER BY timestamp";
+        sql += " WHERE sectorID=\"sector_" + std::to_string(sector_id) + "\"";
+        if( dataset_id >= 0 )
+        {
+            sql += " AND datasetId=\"" + std::to_string(dataset_id) + "\"";
+        }
     }
+    else
+    {
+        if( dataset_id >= 0 )
+        {
+            sql += " WHERE datasetId=\"" + std::to_string(dataset_id) + "\"";
+        }
+    }
+    sql += " ORDER BY timestamp";
+    
     char* zErrMsg = 0;
 
     // Make SQL Statement

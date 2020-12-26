@@ -32,7 +32,9 @@ std::string DB_Point::To_String() const
 /************************************************/
 /*          Normalize the Point Range           */
 /************************************************/
-std::tuple<int,int,int,int> Normalize_Points( std::vector<DB_Point>& point_list )
+std::tuple<int,int,int,int> Normalize_Points( std::vector<DB_Point>& point_list, 
+                                              int                    min_x,
+                                              int                    min_y )
 {
     // Compute min and max of the easting and northings
     auto range = std::make_tuple( (size_t)point_list.front().easting,
@@ -46,6 +48,15 @@ std::tuple<int,int,int,int> Normalize_Points( std::vector<DB_Point>& point_list 
         std::get<1>(range) = std::min( std::get<1>(range), (size_t)p.northing );
         std::get<2>(range) = std::max( std::get<2>(range), (size_t)p.easting );
         std::get<3>(range) = std::max( std::get<3>(range), (size_t)p.northing );
+    }
+
+    if( min_x >= 0 )
+    {
+        std::get<0>(range) = min_x;
+    }
+    if( min_y >= 0 )
+    {
+        std::get<1>(range) = min_y;
     }
 
     // Compute the normalized values

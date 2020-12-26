@@ -69,6 +69,9 @@ struct Options
     // Flag if we want to load the population data rather than randomly generate
     bool load_population_data { false };
 
+    // Dataset-ID to seed the initial GA population from
+    int seed_dataset_id { -1 };
+
     //Path to the population file we'll write on close
     std::filesystem::path population_path { "./population.csv" };
 
