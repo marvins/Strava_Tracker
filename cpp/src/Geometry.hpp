@@ -189,7 +189,7 @@ double Fitness_Score_01( const std::vector<Point_<TP,Dims>>& point_list,
         total_route_len += segment_length;
 
         //std::cout << std::fixed << "Point Distance: " << total_point_distance << ", Segment: " << seg_idx << ", Length: " << segment_length << ", Num Points: " << num_points_in_segment << " of " << point_list.size() << std::endl;
-        total_seg_ratio += ( segment_length / (num_points_in_segment+1) );
+        total_seg_ratio += ( total_point_distance * segment_length / (num_points_in_segment+1) );
     }
     //std::cout << std::fixed << "Min Seg Density: " << min_segment_point_density << std::endl;
     //std::cout << "Num Points: " << point_list.size() << ", Total Length: " << std::fixed << total_route_len << std::endl;
