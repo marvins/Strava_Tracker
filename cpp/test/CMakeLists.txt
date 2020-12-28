@@ -35,7 +35,9 @@ add_executable( route_finder_tests
                 ../src/Stats_Aggregator.cpp
                 ../src/Thread_Pool.hpp
                 ../src/WaypointList.hpp
-                ../src/WaypointList.cpp )
+                ../src/WaypointList.cpp 
+                ../src/Write_Worker.hpp
+                ../src/Write_Worker.cpp )
 
 include_directories( '../googletest/googletest/include' )
 

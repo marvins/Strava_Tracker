@@ -11,6 +11,4 @@ fi
 popd
 
 # Run Route Finder Tests
-./cpp/release/bin/route_finder_tests
-
-
+./cpp/release/bin/route_finder_tests "$@"

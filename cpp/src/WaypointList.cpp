@@ -28,7 +28,7 @@
 
 static double global_min_segment_length = -1;
 
-#define USE_POINT_DENSITY 1
+#define USE_POINT_DENSITY 0
 #define USE_SEGMENT_DENSITY 1
 
 /********************************/
@@ -208,18 +208,24 @@ Point WaypointList::Get_End_Point() const
 /************************************************/
 /*      Get the vertex list from the dna        */
 /************************************************/
-std::vector<Point> WaypointList::Get_Vertices() const
+std::vector<Point> WaypointList::Get_Vertices( bool skip_ends ) const
 {
     std::vector<Point> waypoints( m_number_points +1 );
     
-    waypoints[0] = m_start_point;
+    if( !skip_ends )
+    {
+        waypoints[0] = m_start_point;
+    }
     for( size_t i=0; i<m_number_points; i++ )
     {
         waypoints[i+1].x() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits), m_x_digits ));
         waypoints[i+1].y() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits) + m_x_digits, m_y_digits ));
     }
-    waypoints.push_back( m_end_point );
-    
+    if( !skip_ends )
+    {
+        waypoints.push_back( m_end_point );
+    }
+
     return waypoints;
 }
 
@@ -368,7 +374,20 @@ std::string WaypointList::To_String( bool show_vertices ) const
         const auto& vertices = Get_Vertices();
         for( const auto& v : vertices )
         {
-            sout << v.To_String() << std::endl;
+            std::string extra;
+            if( v.x() > m_max_x || v.y() > m_max_y )
+            {
+                extra = ", OVER_LIMITS: ";
+                if( v.x() > m_max_x )
+                {
+                    extra += "X by " + std::to_string(v.x() - m_max_x );
+                }
+                if( v.y() > m_max_y )
+                {
+                    extra += "Y by " + std::to_string(v.y() - m_max_y );
+                }
+            }
+            sout << v.To_String() << extra << std::endl;
         }
     }
     return sout.str();
@@ -450,6 +469,9 @@ std::map<int,std::vector<WaypointList>> Seed_Population( const std::vector<Point
 {
     std::map<int,std::vector<WaypointList>> output;
 
+    double seed_ratio = 0.5;
+    size_t seed_count = population_size * seed_ratio;
+
     // Iterate over the waypoint range
     for( size_t wp = min_waypoints; wp <= max_waypoints; wp++ )
     {
@@ -458,16 +480,16 @@ std::map<int,std::vector<WaypointList>> Seed_Population( const std::vector<Point
         {
             // Create a vertex list from a distribution of the points
             std::vector<Point> vertex_list;
-            if( wp == 0 ) // Just to be safe, use an even distribution on the first entry
+            if( pop_id == 0 ) // Just to be safe, use an even distribution on the first entry
             {
                 for( size_t x=0; x<wp; x++ )
                 {
                     size_t tidx = std::min( dataset_points.size()-1, 
-                                            std::max( (size_t)0, (size_t)std::round( x * ((double)wp / dataset_points.size()))));
+                                            std::max( (size_t)0, (size_t)(x * dataset_points.size() / wp )));
                     vertex_list.push_back( dataset_points[tidx] );
                 }
             }
-            else
+            else if( pop_id < seed_count )
             {
                 // Create a random list of indeces and load into a set (sets filter duplicates and auto-sort)
                 std::set<size_t> idx_list;
@@ -481,6 +503,15 @@ std::map<int,std::vector<WaypointList>> Seed_Population( const std::vector<Point
                 {
                     vertex_list.push_back( dataset_points[tidx] );
                 }
+            }
+            else
+            {
+                auto temp_wp = WaypointList::Create_Random( wp, 
+                                                            max_x,
+                                                            max_y,
+                                                            start_point,
+                                                            end_point );
+                vertex_list = temp_wp.Get_Vertices( true );
             }
 
             output[wp].emplace_back( vertex_list,

@@ -112,7 +112,7 @@ class WaypointList
         /**
          * @brief Get the vertices from the dna strand
          */
-        std::vector<Point> Get_Vertices() const;
+        std::vector<Point> Get_Vertices( bool skip_ends = false) const;
 
         /**
          * @brief Randomize the Vertices

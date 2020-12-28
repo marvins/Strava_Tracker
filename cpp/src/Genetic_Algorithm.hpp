@@ -128,6 +128,7 @@ class Genetic_Algorithm
                 //////////////////////////////////////////////////////
                 //////////////////////////////////////////////////////
                 // Randomize Unique Entries (No point in crossing-over yourself over and over)
+                #if 0
                 auto start_unique = std::chrono::steady_clock::now();
                 std::sort( m_population.begin(), m_population.end() );
                 auto end_of_unique_iter = std::unique( m_population.begin(), m_population.end() );
@@ -137,15 +138,15 @@ class Genetic_Algorithm
                 {
                     m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(), 
                                                          iteration );
-                    if( rand()%4 < 3 )
-                    {
+                    //if( rand()%4 < 3 )
+                    //{
                         m_random_algorithm( *end_of_unique_iter );
-                    }
-                    else
-                    {
-                        size_t rvidx = rand() % selectionStopIdx;
-                        end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
-                    }
+                    //}
+                    //else
+                    //{
+                    //    size_t rvidx = rand() % selectionStopIdx;
+                    //    end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
+                    //}
                 }
 
                 
@@ -168,6 +169,7 @@ class Genetic_Algorithm
                     m_aggregator.Report_Timing( "Second Fitness Jobs", fitness_time );
                 }
                 m_aggregator.Report_Timing( "Second Fitness Full", fitness_time );
+                #endif
                 //////////////////////////////////////////////////////
                 //////////////////////////////////////////////////////
 

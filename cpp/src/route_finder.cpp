@@ -117,7 +117,9 @@ int main( int argc, char* argv[] )
     }
     else if( options.seed_dataset_id >= 0 )
     {
-        auto dataset_points = Load_Point_List( db, options.db_sector_id, options.seed_dataset_id );
+        auto dataset_points = Load_Point_List( db, 
+                                               options.db_sector_id,
+                                               options.seed_dataset_id );
 
         // Normalize
         Normalize_Points( dataset_points, 
@@ -128,6 +130,8 @@ int main( int argc, char* argv[] )
         {
             dpoints.push_back( ToPoint2D( pt.x_norm, pt.y_norm ) );
         }
+
+        BOOST_LOG_TRIVIAL(debug) << "Building Population from Dataset " << options.seed_dataset_id;
         loaded_population = Seed_Population( dpoints,
                                              options.min_waypoints,
                                              options.max_waypoints,
@@ -151,7 +155,7 @@ int main( int argc, char* argv[] )
     {
         // Build the initial population
         std::vector<WaypointList> initial_population;
-        if( !loaded_population.empty() )
+        if( loaded_population.empty() )
         {
             initial_population = Build_Random_Waypoints( options.population_size,
                                                          num_waypoints,

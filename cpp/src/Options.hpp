@@ -50,7 +50,7 @@ struct Options
     size_t max_iterations { 500 };
 
     /// Exit Repeats ( Should be some percentage of the total iterations )
-    size_t exit_repeats { (size_t)(0.1 * max_iterations) };
+    size_t exit_repeats { (size_t)(0.3 * max_iterations) };
 
     double start_latitude { 0 };
     double start_longitude { 0 };
