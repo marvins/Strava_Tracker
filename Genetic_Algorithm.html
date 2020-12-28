@@ -155,11 +155,11 @@
         aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
     <div class="dropdown-buttons sourcebuttons">
         <a class="repository-button"
-            href="https://github.com/executablebooks/jupyter-book"><button type="button" class="btn btn-secondary topbarbtn"
+            href="https://github.com/marvins/Strava_Tracker"><button type="button" class="btn btn-secondary topbarbtn"
                 data-toggle="tooltip" data-placement="left" title="Source repository"><i
                     class="fab fa-github"></i>repository</button></a>
         <a class="issues-button"
-            href="https://github.com/executablebooks/jupyter-book/issues/new?title=Issue%20on%20page%20%2FGenetic_Algorithm.html&body=Your%20issue%20content%20here."><button
+            href="https://github.com/marvins/Strava_Tracker/issues/new?title=Issue%20on%20page%20%2FGenetic_Algorithm.html&body=Your%20issue%20content%20here."><button
                 type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
                 title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
         
@@ -180,7 +180,7 @@
         aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
     <div class="dropdown-buttons">
         
-        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/docs/Genetic_Algorithm.ipynb"><button type="button"
+        <a class="binder-button" href="https://mybinder.org/v2/gh/marvins/Strava_Tracker/master?urlpath=tree/report/Genetic_Algorithm.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
                 data-placement="left"><img class="binder-button-logo"
                     src="_static/images/logo_binder.svg"
@@ -233,9 +233,9 @@
 <ul class="simple">
 <li><p>The goal of the fitness function is select routes which exhitit the most desirable characteristics</p>
 <ul>
-<li><p>Points should be in the tightest clusters of coordinates.</p>
+<li><p>Vertices should be in the tightest clusters of coordinates.</p>
 <ul>
-<li><p>Points should be within the average of multiple routes.</p></li>
+<li><p>Vertices should be within the average of multiple routes.</p></li>
 </ul>
 </li>
 <li><p>The route should be as short as possible to decrease loopbacks</p></li>
@@ -263,7 +263,7 @@
 </ul>
 <div class="math notranslate nohighlight">
 \[
-    \textrm{F} = \sum_{i=1}^{N_s} \left( \sum_{i=1}^{N_p} d( P, \bar{S} ) \right) \cdot \left| \bar{S} \right|
+    \textrm{F} = \sum_{i=1}^{N_s} \left| \bar{S} \right| \cdot \left( \sum_{i=1}^{N_p} d( P, \bar{S} ) \right)
 \]</div>
 <p>where</p>
 <ul class="simple">
