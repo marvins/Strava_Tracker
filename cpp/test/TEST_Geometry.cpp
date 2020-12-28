@@ -106,7 +106,6 @@ TEST( Geometry, Get_Segment_Density )
     vertex_list.push_back( ToPoint2D(  279.000000, 1891.000000 ));
     vertex_list.push_back( ToPoint2D(  432.000000, 2143.000000 ));
     vertex_list.push_back( ToPoint2D(  719.707200, 2317.696290 ));
-    //BOOST_LOG_TRIVIAL(debug) << qt.To_String();
 
     int step_distance = 25;
     for( size_t i=0; i<10000; i++ )
@@ -122,6 +121,62 @@ TEST( Geometry, Get_Segment_Density )
         BOOST_LOG_TRIVIAL(debug) << a.second.To_String( "Timing Step Distance: " + std::to_string(a.first), "sec");
         BOOST_LOG_TRIVIAL(debug) << density_acc[a.first].To_String( "Density Step Distance: " + std::to_string(a.first), "" );
     }
+
+    // Cleanup
+    sqlite3_close(db);
+}
+
+/*************************************************/
+/*          Test the Fitness Function            */
+/*************************************************/
+TEST( Geometry, Fitness_Score_01 )
+{
+    // Load the database
+    sqlite3 *db;
+    auto rc = sqlite3_open( "cpp/unit_test_data/bike_data.db", &db );
+    ASSERT_EQ( rc, 0 );
+
+    // For Each Sector, Load the points
+    auto point_list = Load_Point_List( db, -1 );
+    ASSERT_GT( point_list.size(), 5000 );
+
+    // Normalize to get standard range
+    auto range = Normalize_Points( point_list );
+    std::vector<Point> geo_point_list;
+    for( const auto& pt : point_list )
+    {
+        geo_point_list.push_back( ToPoint2D( pt.x_norm, pt.y_norm ));
+    }
+
+    // Compute bounding box
+    Rect bbox( ToPoint2D( -10, -10 ),
+               std::get<2>(range) - std::get<0>(range) + 20,
+               std::get<3>(range) - std::get<1>(range) + 20);
+
+    // Create an Accumulator
+    Accumulator<double> acc;
+
+    // Create a vertex list
+    std::vector<Point> vertex_list;
+    vertex_list.push_back( ToPoint2D( 776.628614, 3.773305 ));
+    vertex_list.push_back( ToPoint2D( 870.000000, 279.000000 ));
+    vertex_list.push_back( ToPoint2D(  184.000000, 360.000000 ));
+    vertex_list.push_back( ToPoint2D(  175.000000, 797.000000 ));
+    vertex_list.push_back( ToPoint2D(  23.000000, 900.000000 ));
+    vertex_list.push_back( ToPoint2D(  279.000000, 1891.000000 ));
+    vertex_list.push_back( ToPoint2D(  432.000000, 2143.000000 ));
+    vertex_list.push_back( ToPoint2D(  719.707200, 2317.696290 ));
+
+    const size_t number_iterations = 5;
+    for( size_t i=0; i<number_iterations; i++ )
+    {
+        auto start_time = std::chrono::steady_clock::now();
+        double density = Fitness_Score_01( geo_point_list, vertex_list );
+        auto stop_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_time ).count()/1000.0;
+        acc.Insert( stop_time );
+    }
+    BOOST_LOG_TRIVIAL(debug) << acc.To_String( "Fitness Function 1 Method Timing.", "sec");
+     
 
     // Cleanup
     sqlite3_close(db);

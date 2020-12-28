@@ -60,38 +60,6 @@ double Point_Line_Distance( const Point_<TP,Dims>& p,
     return std::fabs( v_21.x()*v_p1.y() - v_p1.x()*v_21.y()) / v_21.Mag();
 }
 
-
-/**
- * @brief Find the best segment error and density
- * 
- * This method does 2 things
- * 1.  Finds the minimum segment distance for a given reference point against all line segments.
- *
- * 2.  Checks to see if the reference point is within the "step distance" of any line segment. 
- */
-template <typename TP, size_t Dims>
-double Find_Best_Segment_Error( const Point_<TP,Dims>&              ref_point,
-                                const std::vector<Point_<TP,Dims>>& vertices,
-                                std::map<int,int>&                  segment_histogram )
-{
-    double minSegmentDist = -1;
-    int segmentId = -1;
-
-    // Iterate over all vertices, finding the nearest distance to a segment, then do it for each distance to vertex itself
-    for( size_t i=0; i<(vertices.size()-1); i++ )
-    {
-        // Compute the distance to this line segment
-        auto dist = Point_Line_Distance( ref_point, vertices[i], vertices[i+1] );
-        if( minSegmentDist < 0 || dist < minSegmentDist )
-        {
-            minSegmentDist = dist;
-            segmentId = i;
-        }
-    }
-    segment_histogram[segmentId]++;
-    return minSegmentDist;
-}
-
 /**
  * @brief March along the line segment, looking for any regions where there are no points present. 
  *        This will help reduce the impact of switchbacks or other behavior.
@@ -151,4 +119,83 @@ double Get_Segment_Density( const std::vector<Point_<TP,Dims>>& vertices,
     }
 
     return ((double)total_steps / steps_with_points);
+}
+
+/**
+ * @brief Compute Segment Density Score
+ */
+template <typename TP, size_t Dims>
+double Fitness_Score_01( const std::vector<Point_<TP,Dims>>& point_list,
+                         const std::vector<Point_<TP,Dims>>& vertices )
+{
+    // Compute the closest segment for all points
+    std::map<int,std::pair<size_t,double>> segment_point_mapping;
+    for( size_t point_id=0; point_id<point_list.size(); point_id++ )
+    {
+        segment_point_mapping[point_id].first = -1;
+        segment_point_mapping[point_id].second = -1;
+
+        // Iterate over all vertices, finding the nearest distance to a segment, then do it for each distance to vertex itself
+        for( size_t seg_idx=0; seg_idx<(vertices.size()-1); seg_idx++ )
+        {
+            // Compute the distance to this line segment
+            auto dist = Point_Line_Distance( point_list[point_id], 
+                                             vertices[seg_idx], 
+                                             vertices[seg_idx+1] );
+            if( segment_point_mapping[point_id].second < 0 || 
+                dist < segment_point_mapping[point_id].second )
+            {
+                segment_point_mapping[point_id].first = seg_idx;
+                segment_point_mapping[point_id].second = dist;
+            }
+        }
+        //std::cout << "Point: " << point_id << ", Closest Match: " << segment_point_mapping[point_id].first << ", Dist: " << segment_point_mapping[point_id].second << std::endl;
+    }
+
+    // For each segment, compute the density score
+    double min_segment_point_density = -1;//std::numeric_limits<double>::max(); 
+    double segment_length;
+    double total_route_len = 0;
+    double total_seg_ratio = 0;
+    double mean_seg_ratio = 0;
+    for( size_t seg_idx=0; seg_idx < (vertices.size()-1); seg_idx++ )
+    {
+        double total_point_distance = 0;
+        int    num_points_in_segment = 0;
+
+        // For each mapped point, process the distance
+        for( const auto& seg_pnt : segment_point_mapping )
+        {
+            if( seg_pnt.second.first == seg_idx )
+            {
+                total_point_distance += seg_pnt.second.second;
+                num_points_in_segment += 1;
+            }
+        }
+        
+
+        // @todo:  Consider taking average of point distance?  
+        //     Pros:
+        //     Cons:
+        //     - Sum helps penalize overly long segments
+        total_point_distance /= (num_points_in_segment+1);
+
+        // Compute "Min Segment Point Density"
+        min_segment_point_density = std::max( total_point_distance, min_segment_point_density );
+
+        // Get the Segment Length
+        segment_length = Point::Distance_L2( vertices[seg_idx],
+                                             vertices[seg_idx+1] );
+        total_route_len += segment_length;
+
+        //std::cout << std::fixed << "Point Distance: " << total_point_distance << ", Segment: " << seg_idx << ", Length: " << segment_length << ", Num Points: " << num_points_in_segment << " of " << point_list.size() << std::endl;
+        total_seg_ratio += ( segment_length / (num_points_in_segment+1) );
+    }
+    //std::cout << std::fixed << "Min Seg Density: " << min_segment_point_density << std::endl;
+    //std::cout << "Num Points: " << point_list.size() << ", Total Length: " << std::fixed << total_route_len << std::endl;
+
+    // Compute Final Score
+    double score = min_segment_point_density * (point_list.size() /  total_route_len) * total_seg_ratio;
+
+    return score;
 }

@@ -169,9 +169,6 @@ class WaypointList
 
         // The Fitness Score (Lower is better in this GA)
         double m_fitness;
-        double m_point_score { 0 };
-        double m_length_score { 0 };
-        double m_density_score { 0 };
 
         // Number Points
         size_t m_number_points;

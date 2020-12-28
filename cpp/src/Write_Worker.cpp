@@ -43,6 +43,7 @@ void Write_Worker::Write( const WaypointList& wp,
     for( auto& v : vertices )
     {
         DB_Point new_point;
+        new_point.datasetId = wp.Get_DNA();
 
         // Add the UTM offsets
         v += ToPoint2D( std::get<0>(m_point_range), std::get<1>(m_point_range) );
@@ -68,7 +69,7 @@ void Write_Worker::Write( const WaypointList& wp,
         std::filesystem::remove( pname );
         std::ofstream fout;
         fout.open( pname.string() );
-        fout << "NumWaypoints,Iteration,Fitness,GridZone,Easting,Northing,Latitude,Longitude" << std::endl;
+        fout << "NumWaypoints,Iteration,Fitness,GridZone,Easting,Northing,Latitude,Longitude,DNA" << std::endl;
         fout.close();
     }
 
@@ -78,12 +79,12 @@ void Write_Worker::Write( const WaypointList& wp,
     fout.open( pname.string(), std::ios_base::app );
     for( const auto& num : m_master_vertex_list )
     {
-        std::cerr << "Writing vertices for " << num.first << " points" << std::endl;
         for( const auto& point : num.second )
         {
             fout << std::fixed << num.first << "," << iteration << "," << point.x_norm << "," 
                  << point.gz << "," << point.easting << "," << point.northing 
-                 << "," << point.latitude << "," << point.longitude << std::endl;
+                 << "," << point.latitude << "," << point.longitude << ","
+                 << point.datasetId << std::endl;
         }
     }
     fout.close();

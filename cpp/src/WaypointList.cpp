@@ -29,7 +29,8 @@
 static double global_min_segment_length = -1;
 
 #define USE_POINT_DENSITY 0
-#define USE_SEGMENT_DENSITY 1
+#define USE_LENGTH_SCORE 0
+#define USE_SEGMENT_DENSITY 0
 
 /********************************/
 /*          Constructor         */
@@ -123,52 +124,10 @@ void WaypointList::Update_Fitness( void*             context_info,
 
     // Get the vertex list
     auto vertices = Get_Vertices();
-
-    // Compute Point-Score:  Map each reference point against it's "best-fit" line-segment
-    auto start_point = std::chrono::steady_clock::now();
-    m_point_score = 0;
-#if USE_POINT_DENSITY == 1
-    std::map<int,int> segment_histogram;
-    for( const auto& point : context.geo_point_list )
-    {
-        m_point_score += Find_Best_Segment_Error( point, 
-                                                  vertices,
-                                                  segment_histogram );
-    }
-    m_point_score /= context.point_list.size();
-    auto point_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_point ).count() / 1000000.0;
-    aggregator.Report_Timing( "Point Density Timing", point_timing );
-#endif 
-
-    // Compute Length Score
-    m_length_score = 0;
-    for( size_t i=0; i<(vertices.size()-1); i++ )
-    {
-        m_length_score += Point::Distance_L2( vertices[i], vertices[i+1] );
-    }
-    if( new_min_seg_length > 0 )
-    {
-        global_min_segment_length = new_min_seg_length;
-    }
-    else if( global_min_segment_length < 0 )
-    {
-        global_min_segment_length = m_length_score; 
-        BOOST_LOG_TRIVIAL(debug) << "Global-Min-Segment-Length: " << global_min_segment_length << " meters";
-    }
-    m_length_score = 100 * ( m_length_score / global_min_segment_length );
-
-    // Compute Density Score
-    m_density_score = 0;
-#if USE_SEGMENT_DENSITY == 1
-    auto start_density = std::chrono::steady_clock::now();
-    m_density_score = 100 * Get_Segment_Density( vertices,
-                                                 context.point_quad_tree,
-                                                 context.density_step_distance );
-    auto density_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_density ).count() / 1000000.0;
-    aggregator.Report_Timing( "Segment Density Timing", density_timing ); 
-#endif                                                
     
-    m_fitness = m_point_score + m_length_score + m_density_score;
+    m_fitness = Fitness_Score_01( context.geo_point_list,
+                                  vertices );
+
     auto method_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_method ).count() / 1000000.0;
     aggregator.Report_Timing( "Fitness Method Timing", method_timing );
 }
@@ -364,10 +323,7 @@ std::vector<WaypointList> Build_Random_Waypoints( size_t       population_size,
 std::string WaypointList::To_String( bool show_vertices ) const
 {
     std::stringstream sout;
-    sout << "DNA: [" << m_dna << "], Points: [" << m_number_points << "] Fitness: [" 
-         << std::fixed << m_fitness << "], Point Score: [" << m_point_score 
-         << "], Len Score: [" << m_length_score << "], Density Score: [" 
-         << m_density_score << "]";
+    sout << "DNA: [" << m_dna << "], Points: [" << m_number_points << "] Fitness: ["  << std::fixed << m_fitness << "]";
     if( show_vertices )
     {
         sout << std::endl;

@@ -13,17 +13,17 @@ if [ ! "$?" = '0' ]; then
 fi
 popd
 
-ITERATIONS=500
-POP_SIZE=4000
+ITERATIONS=1000
+POP_SIZE=1000
 
 MIN_WP=40
 MAX_WP=40
 
-MUT_RATE='3'
+MUT_RATE='1'
 SRATE='0.4'
 PRATE='0.05'
 
-SEED_ID='2'
+SEED_ID='-1'
 
 # Run Route Finder on Sector-1
 #./cpp/release/bin/route_finder -d ./bike_data.db -sector_id 2 -i ${ITERATIONS} -pop ${POP_SIZE} -minw ${MIN_WP} -maxw ${MAX_WP} \
