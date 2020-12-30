@@ -10,6 +10,9 @@
 #include <tuple>
 #include <vector>
 
+// Project Libraries
+#include "Point.hpp"
+
 /**
  * @class Point
  * @brief Point object from database and used for waypoint estimation.
@@ -18,6 +21,14 @@ class DB_Point
 {
     public:
 
+        /**
+         * @brief Get LLA Coordinate
+         */
+        Point Get_LLA_Coordinate() const;
+
+        /**
+         * @brief Print to String
+         */
         std::string To_String()const;
 
         // Database Fields

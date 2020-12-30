@@ -68,7 +68,7 @@ TEST( Geometry, Get_Segment_Density )
     ASSERT_EQ( rc, 0 );
 
     // For Each Sector, Load the points
-    auto point_list = Load_Point_List( db, -1 );
+    auto point_list = Load_Point_List( db, "" );
     ASSERT_GT( point_list.size(), 5000 );
 
     // Normalize to get standard range
@@ -137,7 +137,7 @@ TEST( Geometry, Fitness_Score_01 )
     ASSERT_EQ( rc, 0 );
 
     // For Each Sector, Load the points
-    auto point_list = Load_Point_List( db, -1 );
+    auto point_list = Load_Point_List( db, "" );
     ASSERT_GT( point_list.size(), 5000 );
 
     // Normalize to get standard range

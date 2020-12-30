@@ -25,12 +25,7 @@
 
 // Boost Libraries
 #include <boost/log/trivial.hpp>
-
-static double global_min_segment_length = -1;
-
-#define USE_POINT_DENSITY 0
-#define USE_LENGTH_SCORE 0
-#define USE_SEGMENT_DENSITY 0
+#include <boost/stacktrace.hpp>
 
 /********************************/
 /*          Constructor         */
@@ -87,6 +82,14 @@ std::string WaypointList::Get_DNA() const
     return m_dna;
 }
 
+/************************************************************/
+/*          Get the Expected Size of the DNA Strand         */
+/************************************************************/
+size_t WaypointList::Get_DNA_Expected_Size() const
+{
+    return (m_number_points * (m_x_digits + m_y_digits) );
+}
+
 /********************************************/
 /*          Get the Fitness Value           */
 /********************************************/
@@ -108,8 +111,7 @@ void WaypointList::Set_Fitness( double fitness )
 /************************************************************************/
 void WaypointList::Update_Fitness( void*             context_info,
                                    bool              check_fitness,
-                                   Stats_Aggregator& aggregator,
-                                   double            new_min_seg_length )
+                                   Stats_Aggregator& aggregator )
 {
     auto start_method = std::chrono::steady_clock::now();
 
@@ -123,13 +125,19 @@ void WaypointList::Update_Fitness( void*             context_info,
     auto context = *reinterpret_cast<Context*>( context_info );
 
     // Get the vertex list
+    auto start_vert = std::chrono::steady_clock::now();
     auto vertices = Get_Vertices();
-    
-    m_fitness = Fitness_Score_01( context.geo_point_list,
+    auto stop_vert = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_vert ).count() / 1000000.0;
+    aggregator.Report_Timing( "Get_Vertices Method Timing", stop_vert );
+
+    auto start_fit = std::chrono::steady_clock::now();    
+    m_fitness = Fitness_Score_03( context.geo_point_list,
                                   vertices );
+    auto stop_fit = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_fit ).count() / 1000000.0;
+    aggregator.Report_Timing( "Direct Fitness Method Timing", stop_fit );
 
     auto method_timing = std::chrono::duration_cast<std::chrono::microseconds>( std::chrono::steady_clock::now() - start_method ).count() / 1000000.0;
-    aggregator.Report_Timing( "Fitness Method Timing", method_timing );
+    aggregator.Report_Timing( "Update_Fitness Method Timing", method_timing );
 }
 
 /****************************************/
@@ -169,16 +177,38 @@ Point WaypointList::Get_End_Point() const
 /************************************************/
 std::vector<Point> WaypointList::Get_Vertices( bool skip_ends ) const
 {
-    std::vector<Point> waypoints( m_number_points +1 );
+    std::vector<Point> waypoints;
     
     if( !skip_ends )
     {
-        waypoints[0] = m_start_point;
+        waypoints.push_back( m_start_point );
     }
     for( size_t i=0; i<m_number_points; i++ )
     {
-        waypoints[i+1].x() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits), m_x_digits ));
-        waypoints[i+1].y() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits) + m_x_digits, m_y_digits ));
+        Point temp_pt;
+        try
+        {
+            temp_pt.x() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits), m_x_digits ));
+        } 
+        catch ( std::exception& e )
+        {
+            BOOST_LOG_TRIVIAL(error) << "Error converting DNA String for X-Value: [" << m_dna << "] Substr: " << i * (m_x_digits + m_y_digits) << " -> " << m_x_digits;
+            BOOST_LOG_TRIVIAL(error) << std::boolalpha << ", Skip-Ends: " << skip_ends;
+            BOOST_LOG_TRIVIAL(error) << boost::stacktrace::stacktrace();
+            std::exit(1);
+        }
+        try
+        {
+            temp_pt.y() = std::stod(m_dna.substr( i * (m_x_digits + m_y_digits) + m_x_digits, m_y_digits ));
+        } 
+        catch ( std::exception& e )
+        {
+            BOOST_LOG_TRIVIAL(error) << "Error converting DNA String for Y-Value: [" << m_dna << "] Substr: " << i * (m_x_digits + m_y_digits) << " -> " << m_x_digits;
+            BOOST_LOG_TRIVIAL(error) << std::boolalpha << ", Skip-Ends: " << skip_ends;
+            BOOST_LOG_TRIVIAL(error) << boost::stacktrace::stacktrace();
+            std::exit(1);
+        }
+        waypoints.push_back( temp_pt );
     }
     if( !skip_ends )
     {
@@ -194,7 +224,7 @@ std::vector<Point> WaypointList::Get_Vertices( bool skip_ends ) const
 void WaypointList::Randomize_Vertices( const WaypointList& wp )
 {
     // Get the vertices
-    auto verts = wp.Get_Vertices();
+    auto verts = wp.Get_Vertices( true );
 
     std::shuffle( verts.begin(), verts.end(), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()) );
     std::stringstream dna;
@@ -243,6 +273,8 @@ WaypointList WaypointList::Create_Random( size_t       number_points,
         dna << std::setfill('0') << std::setw(y_digits) << (rand() % max_y);
     }
 
+    assert( dna.str().size() == (number_points * (x_digits + y_digits)));
+
     return WaypointList( dna.str(), 
                          number_points,
                          max_x,
@@ -262,6 +294,7 @@ WaypointList WaypointList::Crossover( const WaypointList& wp1,
 
     // For now stick with single-point crossover
     auto output_dna = wp1.m_dna.substr(0, idx1) + wp2.m_dna.substr(idx1);
+    assert( output_dna.size() == wp1.m_dna.size() );
     return WaypointList( output_dna,
                          wp1.m_number_points,
                          wp1.m_max_x,
@@ -293,6 +326,7 @@ void WaypointList::Randomize( WaypointList& wp )
     }
     wp.m_dna = dna.str();
     wp.m_fitness = -1;
+    assert( wp.m_dna.size() == wp.Get_DNA_Expected_Size() );
 }
 
 /********************************************************/

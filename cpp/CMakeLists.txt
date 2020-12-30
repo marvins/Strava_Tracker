@@ -6,7 +6,15 @@ cmake_minimum_required ( VERSION 3.0 )
 project( Route_Finder )
 
 find_package( SQLite3 )
-find_package( Boost COMPONENTS system log program_options REQUIRED )
+find_package( Boost 
+              COMPONENTS
+                system 
+                log
+                stacktrace_basic
+                stacktrace_backtrace
+                stacktrace_addr2line
+                stacktrace_noop
+              REQUIRED )
 find_package( GDAL REQUIRED )
 
 set(CMAKE_CXX_STANDARD 17)

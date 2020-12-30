@@ -114,28 +114,9 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.ga_config.stats_output_pathname = args.front();
             args.pop_front();
         }
-        if( arg == "-sector_id" )
-        {
-            output.db_sector_id = std::stoi( args.front() );
-            args.pop_front();
-        }
         if( arg == "-nt" )
         {
             output.number_threads = std::stoi( args.front() );
-            args.pop_front();
-        }
-        if( arg == "-start_point" )
-        {
-            output.start_latitude = std::stod( args.front() );
-            args.pop_front();
-            output.start_longitude = std::stod( args.front() );
-            args.pop_front();
-        }
-        if( arg == "-end_point" )
-        {
-            output.end_latitude = std::stod( args.front() );
-            args.pop_front();
-            output.end_longitude = std::stod( args.front() );
             args.pop_front();
         }
         if( arg == "-input" )
@@ -209,8 +190,6 @@ void Usage( const Options& options )
     sin << "       - Default: " << options.max_iterations << std::endl;
     sin << "   -stats <path>: Path to statistics file" << std::endl;
     sin << "       - Default: " << options.ga_config.stats_output_pathname << std::endl;
-    sin << "   -sector_id <int>: Sector ID to query on.  Skip entry to do all points or value < 0" << std::endl;
-    sin << "       - Default: " << options.db_sector_id << std::endl;
     sin << "   -nt <int>    : Number of threads to use in the population fitness update." << std::endl;
     sin << "       - Default: " << options.number_threads << std::endl;
     sin << "   -input <path> : Load the initial population data from disk." << std::endl;

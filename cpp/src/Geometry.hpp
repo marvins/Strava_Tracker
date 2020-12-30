@@ -24,6 +24,8 @@
 #include "QuadTree.hpp"
 #include "Point.hpp"
 
+//#define PRINT_JUNK
+
 /**
  * @brief Compute the distance from the point to the line segment
  * @param p Test point
@@ -188,14 +190,160 @@ double Fitness_Score_01( const std::vector<Point_<TP,Dims>>& point_list,
                                              vertices[seg_idx+1] );
         total_route_len += segment_length;
 
-        //std::cout << std::fixed << "Point Distance: " << total_point_distance << ", Segment: " << seg_idx << ", Length: " << segment_length << ", Num Points: " << num_points_in_segment << " of " << point_list.size() << std::endl;
-        total_seg_ratio += ( total_point_distance * segment_length / (num_points_in_segment+1) );
+        double tsr = std::pow( segment_length / (num_points_in_segment+1), 2 );
+#ifdef PRINT_JUNK
+        std::cout << std::fixed << "TSR: " << tsr << ", Point Distance: " << total_point_distance << ", Segment: " << seg_idx << ", Length: " << segment_length << ", Num Points: " << num_points_in_segment << " of " << point_list.size() << std::endl;
+#endif
+        total_seg_ratio += tsr;
     }
-    //std::cout << std::fixed << "Min Seg Density: " << min_segment_point_density << std::endl;
-    //std::cout << "Num Points: " << point_list.size() << ", Total Length: " << std::fixed << total_route_len << std::endl;
-
+#ifdef PRINT_JUNK    
+    std::cout << std::fixed << "Min Seg Density: " << min_segment_point_density << std::endl;
+    std::cout << "Num Points: " << point_list.size() << ", Total Length: " << std::fixed << total_route_len << std::endl;
+#endif
     // Compute Final Score
-    double score = min_segment_point_density * (point_list.size() /  total_route_len) * total_seg_ratio;
+    double score = (point_list.size() /  total_route_len) * total_seg_ratio;
 
     return score;
+}
+
+/**
+ * @brief Compute Segment Density Score
+ */
+template <typename TP, size_t Dims>
+double Fitness_Score_02( const std::vector<Point_<TP,Dims>>& point_list,
+                         const std::vector<Point_<TP,Dims>>& vertices )
+{
+    // Compute the closest segment for all points
+    std::map<int,std::pair<size_t,double>> segment_point_mapping;
+    for( size_t point_id=0; point_id<point_list.size(); point_id++ )
+    {
+        segment_point_mapping[point_id].first = -1;
+        segment_point_mapping[point_id].second = -1;
+
+        // Iterate over all vertices, finding the nearest distance to a segment, then do it for each distance to vertex itself
+        for( size_t seg_idx=0; seg_idx<(vertices.size()-1); seg_idx++ )
+        {
+            // Compute the distance to this line segment
+            auto dist = Point_Line_Distance( point_list[point_id], 
+                                             vertices[seg_idx], 
+                                             vertices[seg_idx+1] );
+            if( segment_point_mapping[point_id].second < 0 || 
+                dist < segment_point_mapping[point_id].second )
+            {
+                segment_point_mapping[point_id].first = seg_idx;
+                segment_point_mapping[point_id].second = dist;
+            }
+        }
+    }
+
+    // For each segment, compute the density score
+    double segment_length;
+    double score = 0;
+    double total_length = 0;
+    for( size_t seg_idx=0; seg_idx < (vertices.size()-1); seg_idx++ )
+    {
+        double total_point_distance = 0;
+        int    num_points_in_segment = 0;
+
+        // For each mapped point, process the distance
+        for( const auto& seg_pnt : segment_point_mapping )
+        {
+            if( seg_pnt.second.first == seg_idx )
+            {
+                total_point_distance += seg_pnt.second.second;
+                num_points_in_segment += 1;
+            }
+        }
+        
+
+        // @todo:  Consider taking average of point distance?  
+        //     Pros:
+        //     Cons:
+        //     - Sum helps penalize overly long segments
+        total_point_distance = std::pow(total_point_distance / (num_points_in_segment+1), 2);
+        
+        // Get the Segment Length
+        segment_length = Point::Distance_L2( vertices[seg_idx],
+                                             vertices[seg_idx+1] );
+        total_length += segment_length;
+
+        auto fit_part = total_point_distance;
+        score += fit_part;
+#ifdef PRINT_JUNK
+        std::cout << std::fixed << "fit: " << fit_part << ", Avg Pt Dist: " << total_point_distance << ", Seg: " << seg_idx << ", Length: " << segment_length << ", Num Points: " << num_points_in_segment << " of " << point_list.size() << std::endl;
+#endif
+    }
+
+    return score;
+}
+
+/**
+ * @brief Compute Segment Density Score
+ */
+template <typename TP, size_t Dims>
+double Fitness_Score_03( const std::vector<Point_<TP,Dims>>& point_list,
+                         const std::vector<Point_<TP,Dims>>& vertices )
+{
+    // Compute the closest segment for all points
+    std::map<int,std::pair<size_t,double>> segment_point_mapping;
+    for( size_t point_id=0; point_id<point_list.size(); point_id++ )
+    {
+        segment_point_mapping[point_id].first = -1;
+        segment_point_mapping[point_id].second = -1;
+
+        // Iterate over all vertices, finding the nearest distance to a segment, then do it for each distance to vertex itself
+        for( size_t seg_idx=0; seg_idx<(vertices.size()-1); seg_idx++ )
+        {
+            // Compute the distance to this line segment
+            auto dist = Point_Line_Distance( point_list[point_id], 
+                                             vertices[seg_idx], 
+                                             vertices[seg_idx+1] );
+            if( segment_point_mapping[point_id].second < 0 || 
+                dist < segment_point_mapping[point_id].second )
+            {
+                segment_point_mapping[point_id].first = seg_idx;
+                segment_point_mapping[point_id].second = dist;
+            }
+        }
+    }
+
+    // For each segment, compute the density score
+    double segment_length;
+    double score = 0;
+    double total_length = 0;
+    for( size_t seg_idx=0; seg_idx < (vertices.size()-1); seg_idx++ )
+    {
+        double total_point_distance = 0;
+        int    num_points_in_segment = 0;
+
+        // For each mapped point, process the distance
+        for( const auto& seg_pnt : segment_point_mapping )
+        {
+            if( seg_pnt.second.first == seg_idx )
+            {
+                total_point_distance += seg_pnt.second.second;
+                num_points_in_segment += 1;
+            }
+        }
+        
+
+        // @todo:  Consider taking average of point distance?  
+        //     Pros:
+        //     Cons:
+        //     - Sum helps penalize overly long segments
+        //total_point_distance = std::pow(total_point_distance / (num_points_in_segment+1), 2);
+        
+        // Get the Segment Length
+        segment_length = Point::Distance_L2( vertices[seg_idx],
+                                             vertices[seg_idx+1] );
+        total_length += segment_length;
+
+        auto fit_part = total_point_distance;
+        score += fit_part;
+#ifdef PRINT_JUNK
+        std::cout << std::fixed << "fit: " << fit_part << ", Avg Pt Dist: " << total_point_distance << ", Seg: " << seg_idx << ", Length: " << segment_length << ", Num Points: " << num_points_in_segment << " of " << point_list.size() << std::endl;
+#endif
+    }
+
+    return score * total_length;
 }

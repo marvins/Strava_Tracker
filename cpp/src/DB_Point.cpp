@@ -10,6 +10,14 @@
 #include <sstream>
 #include <vector>
 
+/********************************************/
+/*          Get the LLA Coordinate          */
+/********************************************/
+Point DB_Point::Get_LLA_Coordinate() const
+{
+    return ToPoint2D( longitude, latitude );
+}
+
 /************************************/
 /*          Write To String         */
 /************************************/

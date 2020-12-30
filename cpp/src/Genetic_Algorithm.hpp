@@ -36,6 +36,7 @@ class Genetic_Algorithm
                            std::function<void(Phenotype&)>               mutation_algorithm,
                            std::function<void(Phenotype&)>               random_algorithm,
                            std::function<void(const Phenotype&, size_t)> write_worker,
+                           Stats_Aggregator&                             stats_aggregator,
                            bool                                          append_stats )
           : m_config( config ),
             m_population(population),
@@ -43,6 +44,7 @@ class Genetic_Algorithm
             m_mutation_algorithm(mutation_algorithm),
             m_random_algorithm(random_algorithm),
             m_write_worker(write_worker),
+            m_aggregator(stats_aggregator),
             m_append_stats(append_stats)
         {
         }
@@ -50,7 +52,8 @@ class Genetic_Algorithm
         /**
          * @brief Run the GA
          */
-        std::vector<Phenotype> Run( int                   max_iterations = 1000,
+        std::vector<Phenotype> Run( const std::string&    sector_id,
+                                    int                   max_iterations = 1000,
                                     Exit_Condition::ptr_t exit_condition = std::make_shared<Exit_Condition>(),
                                     void*                 context_info   = nullptr )
         {
@@ -69,6 +72,12 @@ class Genetic_Algorithm
                 sout << "Mutation Size     : " << mutation_size << ", Rate: " << m_config.mutation_rate << std::endl;
                 sout << "Crossover Size    : " << m_population.size() - (preservation_size + selection_size) << std::endl;
                 BOOST_LOG_TRIVIAL(debug) << sout.str();
+            }
+
+            // CHeck Population Validity
+            for( const auto& p : m_population )
+            {
+                assert( p.Get_DNA().size() == p.Get_DNA_Expected_Size( ) );
             }
 
             // Run the iterations
@@ -128,7 +137,7 @@ class Genetic_Algorithm
                 //////////////////////////////////////////////////////
                 //////////////////////////////////////////////////////
                 // Randomize Unique Entries (No point in crossing-over yourself over and over)
-                #if 0
+                #if 1
                 auto start_unique = std::chrono::steady_clock::now();
                 std::sort( m_population.begin(), m_population.end() );
                 auto end_of_unique_iter = std::unique( m_population.begin(), m_population.end() );
@@ -136,17 +145,18 @@ class Genetic_Algorithm
                 // For the duplicates, create random entries
                 for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
                 {
-                    m_aggregator.Report_Duplicate_Entry( m_population.front().Get_Number_Waypoint(), 
+                    m_aggregator.Report_Duplicate_Entry( sector_id,
+                                                         m_population.front().Get_Number_Waypoint(), 
                                                          iteration );
-                    //if( rand()%4 < 3 )
-                    //{
+                    if( rand()%3 == 0 )
+                    {
                         m_random_algorithm( *end_of_unique_iter );
-                    //}
-                    //else
-                    //{
-                    //    size_t rvidx = rand() % selectionStopIdx;
-                    //    end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
-                    //}
+                    }
+                    else
+                    {
+                        size_t rvidx = rand() % selectionStopIdx;
+                        end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
+                    }
                 }
 
                 
@@ -161,8 +171,8 @@ class Genetic_Algorithm
                     {
                         pool.enqueue_work([&]() {
                            member.Update_Fitness( context_info,
-                                                   false,
-                                                   m_aggregator );
+                                                  true,
+                                                  m_aggregator );
                         });
                     }
                     fitness_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_fitness ).count()/1000.0;
@@ -179,7 +189,8 @@ class Genetic_Algorithm
                 BOOST_LOG_TRIVIAL(debug) << "Iteration: " << iteration << ", Current Best Matches: " << Print_Population_List( m_population, 10 );
 
                 auto iter_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_loop_time );
-                m_aggregator.Report_Iteration_Complete( m_population.front().Get_Number_Waypoint(), 
+                m_aggregator.Report_Iteration_Complete( sector_id,
+                                                        m_population.front().Get_Number_Waypoint(), 
                                                         iteration,
                                                         m_population.front().Get_Fitness(),
                                                         iter_time_ms.count()/1000.0 );
@@ -221,7 +232,7 @@ class Genetic_Algorithm
         std::function<void(const Phenotype&, size_t)> m_write_worker;
 
         // Stats Aggregation Class
-        Stats_Aggregator m_aggregator;
+        Stats_Aggregator& m_aggregator;
 
         // Append the Stats File 
         bool m_append_stats { false };

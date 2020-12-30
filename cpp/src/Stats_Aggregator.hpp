@@ -36,16 +36,18 @@ class Stats_Aggregator
         /**
          * @brief Report end of a cycle.
          */
-        void Report_Iteration_Complete( size_t   num_waypoints,
-                                        size_t   iteration_number,
-                                        double   best_fitness,
-                                        double   iteration_time_ms );
+        void Report_Iteration_Complete( const std::string& sector_id,
+                                        size_t             num_waypoints,
+                                        size_t             iteration_number,
+                                        double             best_fitness,
+                                        double             iteration_time_ms );
 
         /**
          * @brief Report a duplicate entry.
          */
-        void Report_Duplicate_Entry( size_t   num_waypoints,
-                                     size_t   iteration_number );
+        void Report_Duplicate_Entry( const std::string& sector_id,
+                                     size_t             num_waypoints,
+                                     size_t             iteration_number );
 
         /**
          * @brief Writing Stats Data to File
@@ -59,10 +61,10 @@ class Stats_Aggregator
         std::map<std::string,Accumulator<double>> m_timing_info;
         mutable std::mutex m_timing_mtx;
 
-        /// Iteration Information
-        std::map<size_t,std::map<size_t,std::tuple<double,double>>> m_iteration_info;
+        /// Iteration Information [sector_id, NumWaypoints, Iteration, [Fitness/Accumulator]]
+        std::map<std::string, std::map<size_t,std::map<size_t,std::tuple<double,double>>>> m_iteration_info;
 
         /// Duplicate Tracker
-        std::map<size_t,std::map<size_t,size_t>> m_duplicate_info;
+        std::map<std::string,std::map<size_t,std::map<size_t,size_t>>> m_duplicate_info;
 
 }; // End of Stats_Aggregator Class

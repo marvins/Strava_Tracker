@@ -83,7 +83,7 @@ TEST( WaypointList, Update_Fitness )
         BOOST_LOG_TRIVIAL(error) << "Test Database Path Does Not Exist: " << db_path;
         FAIL();
     }
-    std::filesystem::path coord_path( "./cpp/unit_test_data/sector_2_test_route.csv" );
+    std::filesystem::path coord_path( "./cpp/unit_test_data/sector_2_edge_cases.csv" );
     if( !std::filesystem::is_regular_file( coord_path ) )
     {
         BOOST_LOG_TRIVIAL(error) << "Coordinate Path Does Not Exist: " << coord_path;
@@ -101,7 +101,7 @@ TEST( WaypointList, Update_Fitness )
     ASSERT_EQ( rc, 0 );
 
     // For Each Sector, Load the points
-    int sector_id = 2;
+    std::string sector_id = "sector_2";
     auto point_list = Load_Point_List( db, sector_id );
     ASSERT_GT( point_list.size(), 1000 );
 
@@ -112,25 +112,9 @@ TEST( WaypointList, Update_Fitness )
     BOOST_LOG_TRIVIAL(debug) << "Min: [" << std::get<0>(range) << ", " << std::get<1>(range) 
                              << "], Max: [" << std::get<2>(range) << ", " << std::get<3>(range) << "]";
 
-    // Load the test coordinate list
-    auto vertices = Load_CSV_Vertices( coord_path, epsg_code );
-    for( auto& v : vertices )
-    {
-        v.x() -= std::get<0>(range);
-        v.y() -= std::get<1>(range);
-    }
-
-    // Create Quad Tree
-    Rect point_bbox( ToPoint2D( -10, -10 ),
-                     std::get<2>(range) - std::get<0>(range) + 20,
-                     std::get<3>(range) - std::get<1>(range) + 20);
-    int max_objects = 8;
-    int max_levels = 10;
-
     // Create Context Object
     Context context;
     context.point_list = point_list;
-    context.density_step_distance = 10;
     context.start_point = start_point;
     context.end_point   = end_point;
     for( const auto& pt : context.point_list )
@@ -138,42 +122,43 @@ TEST( WaypointList, Update_Fitness )
         context.geo_point_list.push_back( ToPoint2D( pt.x_norm, pt.y_norm ) );
     }
 
-    // Create the WaypointList
-    auto wp_test = WaypointList( vertices, 
-                                 max_x,
-                                 max_y,
-                                 start_point,
-                                 end_point );
+    // Load the unit-test fitness data
+    auto fitness_samples = Load_CSV_Fitness_Samples( coord_path );
 
-    // Get the fitness score
+    // Create Reference Sample
     Stats_Aggregator aggregator;
-    wp_test.Update_Fitness( &context, false, aggregator );
-    BOOST_LOG_TRIVIAL(debug) << "Proposed Best WaypointList:\n" << wp_test.To_String(true);
+    auto ref_wp = WaypointList( std::get<1>(fitness_samples[0]), 
+                                std::get<2>(fitness_samples[0]),
+                                max_x,
+                                max_y,
+                                start_point,
+                                end_point );
 
-    // Show the reference to try and beat
-    auto wp_ref = WaypointList( "00460010006100180067002401350081018601230295021003680266054804040651048207070516072005230764055407780566078605730835062108490633091806650951067711020722117907581186076111970767120307711237079412710876128609071299092311390886104409171006093110091032101110391002108709771160096412030903127408901274075812620709127707021279",
-                                wp_test.Get_Number_Waypoint(),
-                                wp_test.Get_Max_X(),
-                                wp_test.Get_Max_Y(),
-                                wp_test.Get_Start_Point(),
-                                wp_test.Get_End_Point() );
-
-    // Get the fitness score
-    wp_ref.Update_Fitness( &context, false, aggregator );
-    BOOST_LOG_TRIVIAL(debug) << "Reference WaypointList:\n" << wp_ref.To_String(true);
-
-    // Test a bad point
-    //auto wp_bad = WaypointList( "01410085015800990163010401690107035702500368026604600340046603470753054407570547076005500782056920690708107907141082057908220608091806651013069711370739115507471169075312650848128609071329094912170899106109151011104310111060100910681002108709701167097301910966120108831273087612760860127608041256066512840666129205621417",
-    auto wp_bad = WaypointList( "12490551274486430965018006271377019807419896021600241336075012910288065811451032131305610459080807260396091513151301091906660172052506861225112701490050003201090727044310711284049901421312101511180047016100928293828506860232040118181162055810401217031900961085136609341152083003440274050910601088078810280809126939801041",
-                                 wp_test.Get_Number_Waypoint(),
-                                 wp_test.Get_Max_X(),
-                                 wp_test.Get_Max_Y(),
-                                 wp_test.Get_Start_Point(),
-                                 wp_test.Get_End_Point() );
-
-    // Get the fitness score
-    wp_bad.Update_Fitness( &context, false, aggregator );
-    BOOST_LOG_TRIVIAL(debug) << "Bad WaypointList:\n" << wp_bad.To_String(true);
+    ref_wp.Update_Fitness( &context, 
+                           false,
+                           aggregator );
+    BOOST_LOG_TRIVIAL(debug) << "Reference Waypoint: " << ref_wp.To_String(true);
+    
+    // Create Test Samples
+    for( size_t i=1; i<fitness_samples.size(); i++ )
+    {
+        // Create waypointlist
+        BOOST_LOG_TRIVIAL(debug) << "Processing Sample: " << std::get<0>(fitness_samples[i]);
+        auto wp = WaypointList( std::get<1>(fitness_samples[i]), 
+                                std::get<2>(fitness_samples[i]),
+                                max_x,
+                                max_y,
+                                start_point,
+                                end_point );
+        
+        // Compute Fitness Update
+        wp.Update_Fitness( &context, 
+                           false,
+                           aggregator );
+        
+        BOOST_LOG_TRIVIAL(debug) << wp.To_String(true);
+        ASSERT_LT( ref_wp.Get_Fitness(), wp.Get_Fitness() );
+    }
 
     // Cleanup
     sqlite3_close(db);
@@ -207,7 +192,7 @@ TEST( WaypointList, Seed_Population )
     ASSERT_EQ( rc, 0 );
 
     // For Sector, Load the points
-    int sector_id = 2;
+    std::string sector_id = "sector_2";
     int dataset_id = 2;
 
     auto point_list = Load_Point_List( db, sector_id );
@@ -230,15 +215,11 @@ TEST( WaypointList, Seed_Population )
     // Create Context Object
     Context context;
     context.point_list = point_list;
-    context.density_step_distance = 25;
     context.start_point = start_point;
     context.end_point   = end_point;
-    context.point_quad_tree = QuadTree<QTNode>( point_bbox, max_objects, max_levels );
     for( const auto& pt : context.point_list )
     {
         context.geo_point_list.push_back( ToPoint2D( pt.x_norm, pt.y_norm ) );
-        auto node = std::make_shared<QTNode>( pt.index, context.geo_point_list.back() );
-        context.point_quad_tree.Insert( node );
     }
 
     // Create the seeded population

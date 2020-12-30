@@ -46,4 +46,5 @@ target_link_libraries( route_finder_tests
                        ${SOCI_LIBRARY}
                        ${Boost_LIBRARIES}
                        ${GDAL_LIBRARIES}
-                       gtest )
+                       gtest
+                       ${CMAKE_DL_LIBS} )

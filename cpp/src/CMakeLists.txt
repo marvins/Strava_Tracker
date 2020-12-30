@@ -39,4 +39,5 @@ target_link_libraries( route_finder
                        SQLite::SQLite3
                        ${SOCI_LIBRARY}
                        ${Boost_LIBRARIES}
-                       ${GDAL_LIBRARIES} )
+                       ${GDAL_LIBRARIES}
+                       ${CMAKE_DL_LIBS} )

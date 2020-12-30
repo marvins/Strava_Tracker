@@ -25,9 +25,6 @@ struct Options
     // Database Name
     std::filesystem::path db_path;
 
-    // Database Sector-ID
-    int db_sector_id { -1 };
-
     // EPSG Code
     int epsg_code { 32613 };
 
@@ -51,11 +48,6 @@ struct Options
 
     /// Exit Repeats ( Should be some percentage of the total iterations )
     size_t exit_repeats { (size_t)(0.3 * max_iterations) };
-
-    double start_latitude { 0 };
-    double start_longitude { 0 };
-    double end_latitude { 0 };
-    double end_longitude { 0 };
 
     // GA Fields
     double preservation_rate { 0.05 };

@@ -71,6 +71,11 @@ class WaypointList
         std::string Get_DNA() const;
 
         /**
+         * @brief Get the expected DNA Size
+         */
+        size_t Get_DNA_Expected_Size() const;
+
+        /**
          * @brief Get the Fitness Score
          */
         double Get_Fitness() const;
@@ -86,8 +91,7 @@ class WaypointList
          */
         void Update_Fitness( void*             context_info,
                              bool              check_fitness,
-                             Stats_Aggregator& aggregator,
-                             double            new_min_seg_length = -1 );
+                             Stats_Aggregator& aggregator );
 
         /**
          * @brief Get the Max X Value
