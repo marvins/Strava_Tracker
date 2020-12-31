@@ -213,8 +213,14 @@ std::string Print_Population_List( const std::vector<WaypointList>& population,
 
 /**
  * @brief Write the population data to disk
+ * 
+ * @param population
+ * @param sector_id
+ * @param output_path
+ * @param append_to_file
  */
 void Write_Population( const std::vector<WaypointList>& population,
+                       const std::string&               sector_id,
                        const std::filesystem::path&     output_path,
                        bool                             append_to_file );
 

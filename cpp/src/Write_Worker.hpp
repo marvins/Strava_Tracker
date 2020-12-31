@@ -12,6 +12,7 @@
 #include "WaypointList.hpp"
 
 // C++ Libraries
+#include <functional>
 #include <map>
 #include <tuple>
 #include <vector>
@@ -23,18 +24,23 @@ class Write_Worker
 {
     public:
 
+        typedef std::function<void(const WaypointList&, const std::string&, size_t)> writer_func_tp;
+
+        typedef std::map<std::string,std::map<int,std::map<int,std::vector<DB_Point>>>> VTX_LIST_TP;
+
         /**
          * @brief Constructor
         */
-        Write_Worker( OGRCoordinateTransformation*            xform_utm2dd,
-                      std::tuple<double,double,double,double> point_range,
-                      int                                     utm_gz,
-                      std::map<int,std::vector<DB_Point>>&    master_vertex_list );
+        Write_Worker( OGRCoordinateTransformation*             xform_utm2dd,
+                      std::tuple<double,double,double,double>  point_range,
+                      int                                      utm_gz,
+                      VTX_LIST_TP&                             master_vertex_list );
 
         /**
          * @brief Update the population data.
         */
         void Write( const WaypointList& wp,
+                    const std::string&  sector_id,
                     size_t              iteration );
 
     private:
@@ -48,6 +54,7 @@ class Write_Worker
         /// UTM Grid Zone
         int m_utm_gz;
 
-        std::map<int,std::vector<DB_Point>>& m_master_vertex_list;
+        // Sector-ID, WP, Iteration,DB-Point
+        VTX_LIST_TP& m_master_vertex_list;
 
 }; // End of Write_Worker Class

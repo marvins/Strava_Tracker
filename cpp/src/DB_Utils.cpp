@@ -150,7 +150,7 @@ sqlite3* Open_Database( const std::filesystem::path& db_path )
     }
     else
     {
-      BOOST_LOG_TRIVIAL(error) << "Opened the database successfully";
+      BOOST_LOG_TRIVIAL(debug) << "Opened the database successfully";
     }
     return db;
 }

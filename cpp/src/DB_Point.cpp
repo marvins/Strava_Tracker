@@ -15,7 +15,7 @@
 /********************************************/
 Point DB_Point::Get_LLA_Coordinate() const
 {
-    return ToPoint2D( longitude, latitude );
+    return ToPoint2D( latitude, longitude );
 }
 
 /************************************/

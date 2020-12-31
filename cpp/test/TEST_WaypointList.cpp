@@ -180,8 +180,8 @@ TEST( WaypointList, Seed_Population )
     // Important Info
     auto start_point = ToPoint2D( 5.707200, 1.696290 );
     auto end_point   = ToPoint2D( 545.149380, 1441.971723 );
-    size_t min_waypoints = 20;
-    size_t max_waypoints = 29;
+    size_t min_waypoints = 6;
+    size_t max_waypoints = 14;
     size_t population_size = 50;
 
     auto xform_utm2dd = Create_UTM_to_DD_Transformation( 32613 );
@@ -203,14 +203,6 @@ TEST( WaypointList, Seed_Population )
     size_t max_y = std::get<3>(range) - std::get<1>(range) + 1;
     BOOST_LOG_TRIVIAL(debug) << "Min: [" << std::get<0>(range) << ", " << std::get<1>(range) 
                              << "], Max: [" << std::get<2>(range) << ", " << std::get<3>(range) << "]";
-
-
-    // Create Quad Tree
-    Rect point_bbox( ToPoint2D( -10, -10 ),
-                     std::get<2>(range) - std::get<0>(range) + 20,
-                     std::get<3>(range) - std::get<1>(range) + 20);
-    int max_objects = 8;
-    int max_levels = 10;
 
     // Create Context Object
     Context context;
@@ -249,7 +241,7 @@ TEST( WaypointList, Seed_Population )
     }
 
     // Write Point Data to Disk
-    std::map<int,std::vector<DB_Point>> master_vertex_list;
+    std::map<std::string,std::map<int,std::map<int,std::vector<DB_Point>>>> master_vertex_list;
     auto writer_obj = std::make_shared<Write_Worker>( xform_utm2dd,
                                                       range,
                                                       point_list.front().gz,
@@ -257,13 +249,19 @@ TEST( WaypointList, Seed_Population )
 
     // Get the fitness score
     Stats_Aggregator aggregator;
-    for( auto& pr : seeded_population )
+    size_t counter = 0;
+    for( size_t sector=0; sector<5; sector++ )
     {
-        for( auto& p : pr.second )
+        for( auto& pr : seeded_population )
         {
-            p.Update_Fitness( &context, false, aggregator );
+            for( auto& p : pr.second )
+            {
+                p.Update_Fitness( &context, false, aggregator );
+            }
+            writer_obj->Write( pr.second.front(), 
+                               "sector_" + std::to_string(sector), 
+                               counter++ );
         }
-        writer_obj->Write( pr.second.front(), 0 );
     }
 
     // Cleanup

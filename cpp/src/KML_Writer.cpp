@@ -12,8 +12,8 @@
 /************************************/
 /*          Write KML File          */
 /************************************/
-void Write_KML( const std::string&                         pathname,
-                const std::map<int,std::vector<DB_Point>>& point_list )
+void Write_KML( const std::string&                                                             pathname,
+                const std::map<std::string,std::map<int,std::map<int,std::vector<DB_Point>>>>& point_list )
 {
     std::ofstream fout;
     fout.open( pathname.c_str() );
@@ -24,18 +24,32 @@ void Write_KML( const std::string&                         pathname,
     fout << "    <name>Waypoint List</name>" << std::endl;
     fout << "    <Style id=\"thickLine\"><LineStyle><width>2.5</width></LineStyle></Style>" << std::endl;
     fout << "    <Style id=\"transparent50Poly\"><PolyStyle><color>7fffffff</color></PolyStyle></Style>" << std::endl;
-    for( const auto& pt : point_list )
+
+    // Iterate over sector
+    for( const auto& sec : point_list )
     {
-        fout << "    <Placemark>" << std::endl;
-        fout << "      <name>Waypoint " << pt.first << "</name>" << std::endl;
-        fout << "      <LineString><coordinates>";
-        for( const auto& a : pt.second )
+        fout << "    <Folder>" << std::endl;
+        fout << "      <name>" << sec.first << "</name>" << std::endl;
+
+        // Iterate over iterations
+        for( const auto& it : sec.second )
         {
-            fout << std::fixed << a.longitude << "," << a.latitude << ",0 ";
+            // Iterate over points
+            for( const auto& pt : it.second )
+            {
+                fout << "      <Placemark>" << std::endl;
+                fout << "        <name>Sector: " << sec.first << ", Iteration: " << it.first << ", Waypoint " << pt.first << "</name>" << std::endl;
+                fout << "        <LineString><coordinates>";
+                for( const auto& a : pt.second )
+                {
+                    fout << std::fixed << a.longitude << "," << a.latitude << ",0 ";
+                }
+                fout << "</coordinates></LineString>" << std::endl;
+                fout << "        <styleUrl>#thickLine</styleUrl>" << std::endl;
+                fout << "      </Placemark>" << std::endl;
+            }
         }
-        fout << "</coordinates></LineString>" << std::endl;
-        fout << "      <styleUrl>#thickLine</styleUrl>" << std::endl;
-        fout << "    </Placemark>" << std::endl;
+        fout << "    </Folder>" << std::endl;
     }
     fout << "  </Document>" << std::endl;
     fout << "</kml>" << std::endl;

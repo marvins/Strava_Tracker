@@ -15,6 +15,9 @@
 
 /**
  * @brief Write KML File
+ * 
+ * @param pathname
+ * @param point_list
  */
-void Write_KML( const std::string&                         pathname,
-                const std::map<int,std::vector<DB_Point>>& point_list );
+void Write_KML( const std::string&                                                             pathname,
+                const std::map<std::string,std::map<int,std::map<int,std::vector<DB_Point>>>>& point_list );

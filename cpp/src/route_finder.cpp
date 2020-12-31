@@ -46,10 +46,13 @@ int main( int argc, char* argv[] )
     // Global Stats Aggregator
     Stats_Aggregator stats_aggregator;
 
+    // Master List of Vertices
+    Write_Worker::VTX_LIST_TP master_vertex_list;
+
     // Iterate over each sector
     for( const auto& sector_id : sector_ids )
     {
-        // For Each Sector, Load the points
+        // For the sector, load the points
         auto point_list = Load_Point_List( db, sector_id.first );
 
         // Get point range
@@ -70,13 +73,6 @@ int main( int argc, char* argv[] )
                                               std::get<1>( sector_id.second ).Get_LLA_Coordinate() ) - ToPoint2D( std::get<0>(point_range), 
                                                                                                                   std::get<1>(point_range) );
         BOOST_LOG_TRIVIAL(debug) << "Starting Point: " << start_point.To_String() << ", Ending Point: " << end_point.To_String();
-    
-        // Create Quad Tree
-        Rect point_bbox( ToPoint2D( -10, -10 ),
-                         std::get<2>(point_range) - std::get<0>(point_range) + 20,
-                         std::get<3>(point_range) - std::get<1>(point_range) + 20);
-        int max_objects = 8;
-        int max_levels = 10;
 
         // Construct the Context info
         Context context;
@@ -89,9 +85,6 @@ int main( int argc, char* argv[] )
         }
         auto context_ptr = reinterpret_cast<void*>( &context );
 
-
-        // Master List of Vertices
-        std::map<int,std::vector<DB_Point>> master_vertex_list;
 
         // Input population data (if requested)
         std::map<int,std::vector<WaypointList>> loaded_population;
@@ -133,7 +126,7 @@ int main( int argc, char* argv[] )
                                                           point_range,
                                                           point_list.front().gz,
                                                           master_vertex_list );
-        std::function<void(const WaypointList&, size_t)> write_worker = std::bind( &Write_Worker::Write, writer_obj, _1, _2 );
+        Write_Worker::writer_func_tp write_worker = std::bind( &Write_Worker::Write, writer_obj, _1, _2, _3 );
 
         // Iterate over each waypoint count
         for( int num_waypoints = options.min_waypoints; 
@@ -178,10 +171,15 @@ int main( int argc, char* argv[] )
             BOOST_LOG_TRIVIAL(debug) << "Most Fit Population List, " << Print_Population_List( population, 10 );
             BOOST_LOG_TRIVIAL(debug) << "Best Fit Item: " << population[0].To_String(true);
 
-            write_worker( population[0], options.max_iterations );  
+            write_worker( population[0], 
+                          sector_id.first, 
+                          options.max_iterations );  
 
             // Write the population data to disk
-            Write_Population( population, options.population_path, true );
+            Write_Population( population, 
+                              sector_id.first,
+                              options.population_path, 
+                              true );
     
         } // End of Waypoint Number Loop
 

@@ -20,10 +20,10 @@
 /********************************/
 /*          Constructor         */
 /********************************/
-Write_Worker::Write_Worker( OGRCoordinateTransformation*            xform_utm2dd,
-                            std::tuple<double,double,double,double> point_range,
-                            int                                     utm_gz,
-                            std::map<int,std::vector<DB_Point>>&    master_vertex_list )
+Write_Worker::Write_Worker( OGRCoordinateTransformation*             xform_utm2dd,
+                            std::tuple<double,double,double,double>  point_range,
+                            int                                      utm_gz,
+                            VTX_LIST_TP&                             master_vertex_list )
   : m_xform_utm2dd( xform_utm2dd ),
     m_point_range( std::move( point_range ) ),
     m_utm_gz( utm_gz ),
@@ -35,6 +35,7 @@ Write_Worker::Write_Worker( OGRCoordinateTransformation*            xform_utm2dd
 /*          Write data to disk          */
 /****************************************/
 void Write_Worker::Write( const WaypointList& wp,
+                          const std::string&  sector_id,
                           size_t              iteration )
 {
     // Store the results of this run
@@ -44,6 +45,7 @@ void Write_Worker::Write( const WaypointList& wp,
     {
         DB_Point new_point;
         new_point.datasetId = wp.Get_DNA();
+        new_point.index     = iteration;
 
         // Add the UTM offsets
         v += ToPoint2D( std::get<0>(m_point_range), std::get<1>(m_point_range) );
@@ -59,34 +61,36 @@ void Write_Worker::Write( const WaypointList& wp,
         new_point.longitude = temp_lla.m_data[1];
         vertex_point_list.push_back( new_point );
     }
-    m_master_vertex_list[wp.Get_Number_Waypoint()] = vertex_point_list;
+    m_master_vertex_list[sector_id][wp.Get_Number_Waypoint()][iteration] = vertex_point_list;
 
-    // If it is iteration 0, then wipe out the file first
-    std::filesystem::path pname( "./waypoints.csv" );
-    if( iteration == 0 )
-    {
-        BOOST_LOG_TRIVIAL(debug) << "Removing existing waypoint file: " << pname.string();
-        std::filesystem::remove( pname );
-        std::ofstream fout;
-        fout.open( pname.string() );
-        fout << "NumWaypoints,Iteration,Fitness,GridZone,Easting,Northing,Latitude,Longitude,DNA" << std::endl;
-        fout.close();
-    }
 
     // Write Latest Results
-    BOOST_LOG_TRIVIAL(debug) << "Writing KML data to " + pname.string();
+    std::filesystem::path pname( "./waypoints.csv" );
+    BOOST_LOG_TRIVIAL(debug) << "Sector: " << sector_id << ", Iteration: " << iteration << ", Writing Waypoint Data: " << pname.string();
     std::ofstream fout;
-    fout.open( pname.string(), std::ios_base::app );
-    for( const auto& num : m_master_vertex_list )
+    fout.open( pname.string() );
+    fout << "SectorId,NumWaypoints,Iteration,Fitness,GridZone,Easting,Northing,Latitude,Longitude,DNA" << std::endl;
+
+    // Loop over Sectors
+    for( const auto& sec : m_master_vertex_list )
     {
-        for( const auto& point : num.second )
+        // Loop over Waypoints
+        for( const auto& num : sec.second )
         {
-            fout << std::fixed << num.first << "," << iteration << "," << point.x_norm << "," 
-                 << point.gz << "," << point.easting << "," << point.northing 
-                 << "," << point.latitude << "," << point.longitude << ","
-                 << point.datasetId << std::endl;
-        }
-    }
+            // Loop over iterations
+            for( const auto& iter : num.second )
+            {
+                // Loop over points
+                for( const auto& point : iter.second )
+                {
+                    fout << sec.first << "," << num.first << std::fixed << "," << iter.first << "," << point.x_norm << "," 
+                         << point.gz << "," << point.easting << "," << point.northing 
+                         << "," << point.latitude << "," << point.longitude << ","
+                         << point.datasetId << std::endl;
+                } // End of Point Loop
+            } // End of Iteration Loop
+        } // End of Waypoint Loop
+    } // End of Sector Loop
     fout.close();
 
     std::string waypoint_pathname = "waypoints.kml";

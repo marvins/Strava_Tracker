@@ -35,7 +35,9 @@ class Genetic_Algorithm
                                                    const Phenotype&)>    crossover_algorithm,
                            std::function<void(Phenotype&)>               mutation_algorithm,
                            std::function<void(Phenotype&)>               random_algorithm,
-                           std::function<void(const Phenotype&, size_t)> write_worker,
+                           std::function<void(const Phenotype&, 
+                                              const std::string& string, 
+                                              size_t)>                   write_worker,
                            Stats_Aggregator&                             stats_aggregator,
                            bool                                          append_stats )
           : m_config( config ),
@@ -206,7 +208,7 @@ class Genetic_Algorithm
                 }
 
                 // Write Latest Results
-                m_write_worker( m_population.front(), iteration );
+                m_write_worker( m_population.front(), sector_id, iteration );
             }
             return m_population;
         }
@@ -229,7 +231,7 @@ class Genetic_Algorithm
         std::function<void(Phenotype&)> m_random_algorithm;
 
         // Intermediate Write Worker
-        std::function<void(const Phenotype&, size_t)> m_write_worker;
+        std::function<void(const Phenotype&, const std::string&, size_t)> m_write_worker;
 
         // Stats Aggregation Class
         Stats_Aggregator& m_aggregator;

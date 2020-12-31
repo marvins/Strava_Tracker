@@ -7,6 +7,7 @@
 
 // Boost Libraries
 #include <boost/log/trivial.hpp>
+#include <boost/stacktrace.hpp>
 
 /************************************************/
 /*      Create UTM to Lat-Lon Transformer       */
@@ -41,7 +42,7 @@ Point Convert_Coordinate( OGRCoordinateTransformation* transformer,
     Point output = utm_coord;
     if( !transformer->Transform( 1, &output.m_data[0], &output.m_data[1], 0 ) )
     {
-        BOOST_LOG_TRIVIAL(error) << "Transform failed.";
+        BOOST_LOG_TRIVIAL(error) << "Transform failed.\nPoint: " << utm_coord.To_String() << "\n" << boost::stacktrace::stacktrace();
     }
     return output;
 }

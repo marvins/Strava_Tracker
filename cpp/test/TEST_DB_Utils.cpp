@@ -66,8 +66,8 @@ TEST( DB_Utils, Load_Sector_Data )
     auto sector_data = Load_Sector_Data( db );
     
     ASSERT_EQ( sector_data.size(), 9 );
-    ASSERT_NEAR( Point::Distance_L2( std::get<0>(sector_data["sector_0"]).Get_LLA_Coordinate(), ToPoint2D( -104.860817, 39.598926 ) ), 0, 0.001 );
-    ASSERT_NEAR( Point::Distance_L2( std::get<1>(sector_data["sector_8"]).Get_LLA_Coordinate(), ToPoint2D( -105.00005525, 39.75488375 ) ), 0, 0.001 );
+    ASSERT_NEAR( Point::Distance_L2( std::get<0>(sector_data["sector_0"]).Get_LLA_Coordinate(), ToPoint2D( 39.598926, -104.860817 ) ), 0, 0.001 );
+    ASSERT_NEAR( Point::Distance_L2( std::get<1>(sector_data["sector_8"]).Get_LLA_Coordinate(), ToPoint2D( 39.75488375, -105.00005525 ) ), 0, 0.001 );
 
     // Cleanup
     sqlite3_close(db);

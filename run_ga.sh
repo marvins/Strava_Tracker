@@ -16,14 +16,14 @@ popd
 ITERATIONS=1000
 POP_SIZE=2000
 
-MIN_WP=20
-MAX_WP=40
+MIN_WP=8
+MAX_WP=8
 
 MUT_RATE='1'
 SRATE='0.4'
 PRATE='0.05'
 
-SEED_ID='2'
+SEED_ID='-1'
 
 # Run Route Finder on Sector-1
 #./cpp/release/bin/route_finder -d ./bike_data.db -sector_id 1 -i ${ITERATIONS} -pop ${POP_SIZE} -minw ${MIN_WP} -maxw ${MAX_WP} \

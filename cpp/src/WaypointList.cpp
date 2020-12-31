@@ -407,6 +407,7 @@ std::string Print_Population_List( const std::vector<WaypointList>& population,
 /*          Write the Population Data           */
 /************************************************/
 void Write_Population( const std::vector<WaypointList>& population,
+                       const std::string&               sector_id,
                        const std::filesystem::path&     output_path,
                        bool                             append_to_file )
 {
