@@ -29,7 +29,7 @@ class Genetic_Algorithm
          * @param config Configuration of the GA
          * @param population Initial population sample
          */
-        Genetic_Algorithm( GA_Config                                     config,
+        Genetic_Algorithm( const GA_Config&                              config,
                            std::vector<Phenotype>                        population,
                            std::function<Phenotype(const Phenotype&, 
                                                    const Phenotype&)>    crossover_algorithm,
@@ -38,16 +38,14 @@ class Genetic_Algorithm
                            std::function<void(const Phenotype&, 
                                               const std::string& string, 
                                               size_t)>                   write_worker,
-                           Stats_Aggregator&                             stats_aggregator,
-                           bool                                          append_stats )
+                           Stats_Aggregator&                             stats_aggregator )
           : m_config( config ),
             m_population(population),
             m_crossover_algorithm(crossover_algorithm),
             m_mutation_algorithm(mutation_algorithm),
             m_random_algorithm(random_algorithm),
             m_write_worker(write_worker),
-            m_aggregator(stats_aggregator),
-            m_append_stats(append_stats)
+            m_aggregator(stats_aggregator)
         {
         }
 
@@ -73,7 +71,7 @@ class Genetic_Algorithm
                 sout << "Selection Size    : " << selection_size << ", Rate: " << m_config.selection_rate << std::endl;
                 sout << "Mutation Size     : " << mutation_size << ", Rate: " << m_config.mutation_rate << std::endl;
                 sout << "Crossover Size    : " << m_population.size() - (preservation_size + selection_size) << std::endl;
-                BOOST_LOG_TRIVIAL(debug) << sout.str();
+                BOOST_LOG_TRIVIAL(debug) << "Sector: " << sector_id << ", " << sout.str();
             }
 
             // CHeck Population Validity
@@ -145,12 +143,11 @@ class Genetic_Algorithm
                 auto end_of_unique_iter = std::unique( m_population.begin(), m_population.end() );
 
                 // For the duplicates, create random entries
+                size_t number_duplicates = 0;
                 for( ; end_of_unique_iter != m_population.end(); end_of_unique_iter++ )
                 {
-                    m_aggregator.Report_Duplicate_Entry( sector_id,
-                                                         m_population.front().Get_Number_Waypoint(), 
-                                                         iteration );
-                    if( rand()%3 == 0 )
+                    number_duplicates++;
+                    if( rand()%2 == 0 )
                     {
                         m_random_algorithm( *end_of_unique_iter );
                     }
@@ -160,6 +157,10 @@ class Genetic_Algorithm
                         end_of_unique_iter->Randomize_Vertices( m_population[rvidx] );
                     }
                 }
+                m_aggregator.Report_Duplicate_Entry( sector_id,
+                                                     m_population.front().Get_Number_Waypoint(),
+                                                     iteration,
+                                                     number_duplicates ); 
 
                 
                 auto unique_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_unique ).count()/1000.0;
@@ -188,7 +189,7 @@ class Genetic_Algorithm
                 // Sort the population one last time
                 std::sort( m_population.begin(), m_population.end() );
 
-                BOOST_LOG_TRIVIAL(debug) << "Iteration: " << iteration << ", Current Best Matches: " << Print_Population_List( m_population, 10 );
+                BOOST_LOG_TRIVIAL(debug) << "Sector: " << sector_id << ", Iteration: " << iteration << ", Current Best Matches: " << Print_Population_List( m_population, 10 );
 
                 auto iter_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_loop_time );
                 m_aggregator.Report_Iteration_Complete( sector_id,
@@ -197,10 +198,6 @@ class Genetic_Algorithm
                                                         m_population.front().Get_Fitness(),
                                                         iter_time_ms.count()/1000.0 );
 
-                // Write Stats Data
-                m_aggregator.Write_Stats_Info( m_config.stats_output_pathname,
-                                               m_append_stats );
-
                 // Check Exit Condition
                 if( exit_condition->Check_Exit( m_population.front().Get_Fitness() ) )
                 {
@@ -208,7 +205,13 @@ class Genetic_Algorithm
                 }
 
                 // Write Latest Results
+                auto start_write = std::chrono::steady_clock::now();
                 m_write_worker( m_population.front(), sector_id, iteration );
+                auto write_time = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::steady_clock::now() - start_write ).count()/1000.0;
+                m_aggregator.Report_Timing( "Write Worker Time", write_time );
+
+                // Sleep so other sectors get a chance to get started
+                std::this_thread::sleep_for( std::chrono::microseconds(50) );
             }
             return m_population;
         }
@@ -235,8 +238,5 @@ class Genetic_Algorithm
 
         // Stats Aggregation Class
         Stats_Aggregator& m_aggregator;
-
-        // Append the Stats File 
-        bool m_append_stats { false };
         
 }; // End of Genetic_Algorithm Class

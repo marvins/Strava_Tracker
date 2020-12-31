@@ -7,9 +7,12 @@
 
 // C++ Libraries
 #include <chrono>
+#include <condition_variable>
+#include <deque>
 #include <map>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <tuple>
 
 // Project Libraries
@@ -23,9 +26,18 @@ class Stats_Aggregator
     public:
 
         /**
+         * @brief Constructor
+         */
+        Stats_Aggregator( const std::string& output_filename );
+
+        /**
          * @brief Print Stats Information
          */
         virtual ~Stats_Aggregator();
+
+        void Start_Writer();
+
+        void Stop_Writer();
 
         /**
          * @brief Report Timing Info
@@ -47,24 +59,35 @@ class Stats_Aggregator
          */
         void Report_Duplicate_Entry( const std::string& sector_id,
                                      size_t             num_waypoints,
-                                     size_t             iteration_number );
+                                     size_t             iteration_number,
+                                     size_t             number_duplicates );
+
+    private:
 
         /**
          * @brief Writing Stats Data to File
          */
-        void Write_Stats_Info( const std::string& output_pathname,
-                               bool               append_file );
+        void Write_Stats_Info();
 
-    private:
+        /// Output Pathname
+        std::string m_output_pathname;
 
         /// Timing Information
         std::map<std::string,Accumulator<double>> m_timing_info;
-        mutable std::mutex m_timing_mtx;
 
         /// Iteration Information [sector_id, NumWaypoints, Iteration, [Fitness/Accumulator]]
-        std::map<std::string, std::map<size_t,std::map<size_t,std::tuple<double,double>>>> m_iteration_info;
+        std::deque<std::string> m_iteration_info;
 
         /// Duplicate Tracker
-        std::map<std::string,std::map<size_t,std::map<size_t,size_t>>> m_duplicate_info;
+        std::deque<std::string> m_duplicate_info;
+
+        /// Access Lock
+        mutable std::mutex m_timing_mtx;
+        mutable std::mutex m_iter_mtx;
+        mutable std::mutex m_dup_mtx;
+
+        /// Write Thread
+        std::thread m_write_thread;
+        bool m_okay_to_run { true };
 
 }; // End of Stats_Aggregator Class

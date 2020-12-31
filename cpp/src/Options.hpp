@@ -47,7 +47,7 @@ struct Options
     size_t max_iterations { 500 };
 
     /// Exit Repeats ( Should be some percentage of the total iterations )
-    size_t exit_repeats { (size_t)(0.3 * max_iterations) };
+    size_t exit_repeats { (size_t)(0.1 * max_iterations) };
 
     // GA Fields
     double preservation_rate { 0.05 };
@@ -55,8 +55,8 @@ struct Options
     double mutation_rate { 0.8 };
     double random_vert_rate { 0.05 };
 
-    // Application Overhead
-    int number_threads = 10;
+    // Genetic Algorithm Thread
+    int ga_threads = 2;
 
     // Flag if we want to load the population data rather than randomly generate
     bool load_population_data { false };
@@ -66,7 +66,6 @@ struct Options
 
     //Path to the population file we'll write on close
     std::filesystem::path population_path { "./population.csv" };
-
 
 }; // End of Options Class
 

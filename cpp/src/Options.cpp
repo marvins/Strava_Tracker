@@ -114,9 +114,9 @@ Options Parse_Command_Line( int argc, char* argv[] )
             output.ga_config.stats_output_pathname = args.front();
             args.pop_front();
         }
-        if( arg == "-nt" )
+        if( arg == "-gt" )
         {
-            output.number_threads = std::stoi( args.front() );
+            output.ga_threads = std::stoi( args.front() );
             args.pop_front();
         }
         if( arg == "-input" )
@@ -190,8 +190,8 @@ void Usage( const Options& options )
     sin << "       - Default: " << options.max_iterations << std::endl;
     sin << "   -stats <path>: Path to statistics file" << std::endl;
     sin << "       - Default: " << options.ga_config.stats_output_pathname << std::endl;
-    sin << "   -nt <int>    : Number of threads to use in the population fitness update." << std::endl;
-    sin << "       - Default: " << options.number_threads << std::endl;
+    sin << "   -gt <int>    : Number of threads to use in the population fitness update." << std::endl;
+    sin << "       - Default: " << options.ga_threads << std::endl;
     sin << "   -input <path> : Load the initial population data from disk." << std::endl;
     sin << "       - Default behavior is to randomly generate a population." << std::endl;
     sin << "         Too few entries will result in the remaining entries being randomly created." << std::endl;

@@ -8,11 +8,14 @@
 // C++ Libraries
 #include <functional>
 #include <iostream>
+#include <mutex>
 
 // Boost Libraries
 #include <boost/log/trivial.hpp>
 
 static std::vector<std::string> sector_list;
+
+static std::mutex db_mtx;
 
 /************************************/
 /*          Callback Worker         */
@@ -139,6 +142,7 @@ static int point_callback( void *data, int argc, char **argv, char **azColName )
 /****************************************/
 sqlite3* Open_Database( const std::filesystem::path& db_path )
 {
+    std::lock_guard<std::mutex> lck(db_mtx);
     sqlite3 *db;
     auto rc = sqlite3_open( db_path.c_str(), &db );
 
@@ -160,6 +164,7 @@ sqlite3* Open_Database( const std::filesystem::path& db_path )
 /********************************/
 std::map<std::string,std::tuple<DB_Point,DB_Point>>  Load_Sector_Data( sqlite3 *db )
 {
+    std::lock_guard<std::mutex> lck(db_mtx);
     // Step 1: Load the list of sector names
     // Create Statement
     std::vector<std::string> sector_list;
@@ -206,6 +211,7 @@ std::vector<DB_Point> Load_Point_List( sqlite3*           db,
                                        const std::string& sector_id, 
                                        int                dataset_id )
 {
+    std::lock_guard<std::mutex> lck(db_mtx);
     // Create Statement
     std::string sql = "SELECT * FROM point_list";
     if( !sector_id.empty() )

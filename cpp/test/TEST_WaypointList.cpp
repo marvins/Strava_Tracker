@@ -126,7 +126,8 @@ TEST( WaypointList, Update_Fitness )
     auto fitness_samples = Load_CSV_Fitness_Samples( coord_path );
 
     // Create Reference Sample
-    Stats_Aggregator aggregator;
+    Stats_Aggregator aggregator( "junk_path" );
+    aggregator.Start_Writer();
     auto ref_wp = WaypointList( std::get<1>(fitness_samples[0]), 
                                 std::get<2>(fitness_samples[0]),
                                 max_x,
@@ -248,7 +249,8 @@ TEST( WaypointList, Seed_Population )
                                                       master_vertex_list );
 
     // Get the fitness score
-    Stats_Aggregator aggregator;
+    Stats_Aggregator aggregator( "junk_path" );
+    aggregator.Start_Writer();
     size_t counter = 0;
     for( size_t sector=0; sector<5; sector++ )
     {
