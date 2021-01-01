@@ -25,6 +25,9 @@ struct Options
     // Database Name
     std::filesystem::path db_path;
 
+    // Sector ID
+    int sector_id { -1 };
+
     // EPSG Code
     int epsg_code { 32613 };
 

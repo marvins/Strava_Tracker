@@ -51,3 +51,19 @@ bool Exit_Condition::Check_Exit( double fitness )
     }
     return false;
 }
+
+/****************************************/
+/*          Get the Max Matches         */
+/****************************************/
+size_t Exit_Condition::Get_Max_Matches() const
+{
+    return m_max_matches;
+}
+
+/********************************/
+/*          Get the EPS         */
+/********************************/
+double Exit_Condition::Get_EPS() const
+{
+    return m_eps;
+}

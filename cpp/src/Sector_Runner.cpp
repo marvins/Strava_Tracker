@@ -166,9 +166,11 @@ void Sector_Runner::Run()
                                                 m_stats_aggregator );
 
             // Run the GA
+            auto exit_condition = std::make_shared<Exit_Condition>( m_options.exit_condition->Get_Max_Matches(),
+                                                                    m_options.exit_condition->Get_EPS() );
             auto population = ga.Run( m_sector_id,
                                       m_options.max_iterations,
-                                      m_options.exit_condition,
+                                      exit_condition,
                                       context_ptr );
 
             // Check our results

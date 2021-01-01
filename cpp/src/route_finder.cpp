@@ -28,6 +28,18 @@ int main( int argc, char* argv[] )
 
     // Load the list of sectors
     auto sector_ids = Load_Sector_Data( db );
+
+    if( options.sector_id >= 0 )
+    {
+        auto it = sector_ids.begin();
+        for( size_t i=0; i<options.sector_id; i++, it++ ){}
+
+        auto id  = it->first;
+        auto pts = it->second;
+
+        sector_ids.clear();
+        sector_ids[id] = pts;
+    }
    
     // Define our mutation and crossover algorithms
     WaypointList::crossover_func_tp crossover_algorithm = WaypointList::Crossover;

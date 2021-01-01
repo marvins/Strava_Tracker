@@ -41,94 +41,104 @@ Options Parse_Command_Line( int argc, char* argv[] )
         }
 
         // Check DB Path
-        if( arg == "-d" )
+        else if( arg == "-d" )
         {
             output.db_path = args.front();
             args.pop_front();
         }
 
         // Check Mutation Rate
-        if( arg == "-m" )
+        else if( arg == "-m" )
         {
             output.mutation_rate = std::stod( args.front() );
             args.pop_front();
         }
 
         // Check Preservation Rate
-        if( arg == "-p" )
+        else if( arg == "-p" )
         {
             output.preservation_rate = std::stod( args.front() );
             args.pop_front();
         }
 
         // Check Selection Rate
-        if( arg == "-s" )
+        else if( arg == "-s" )
         {
             output.selection_rate = std::stod( args.front() );
             args.pop_front();
         }
 
         // Random Vert Rate
-        if( arg == "-r" )
+        else if( arg == "-r" )
         {
             output.random_vert_rate = std::stod( args.front() );
             args.pop_front();
         }
 
         // Vertices
-        if( arg == "-maxw" )
+        else if( arg == "-maxw" )
         {
             output.max_waypoints = std::stoi( args.front() );
             args.pop_front();
         }
-        if( arg == "-minw" )
+        else if( arg == "-minw" )
         {
             output.min_waypoints = std::stoi( args.front() );
             args.pop_front();
         }
 
-        if( arg == "-err" )
+        else if( arg == "-err" )
         {
-            output.exit_repeats = std::stod( args.front() );
+            output.exit_repeats = std::stoi( args.front() );
             args.pop_front();
         }
 
-        if( arg == "-epsg" )
+        else if( arg == "-epsg" )
         {
             output.epsg_code = std::stoi( args.front() );
             args.pop_front();
         }
 
-        if( arg == "-pop" )
+        else if( arg == "-pop" )
         {
             output.population_size = std::stoi( args.front() );
             args.pop_front();
         }
-        if( arg == "-i" )
+        else if( arg == "-i" )
         {
             output.max_iterations = std::stoi( args.front() );
             args.pop_front();
         }
-        if( arg == "-stats" )
+        else if( arg == "-stats" )
         {
             output.ga_config.stats_output_pathname = args.front();
             args.pop_front();
         }
-        if( arg == "-gt" )
+        else if( arg == "-gt" )
         {
             output.ga_threads = std::stoi( args.front() );
             args.pop_front();
         }
-        if( arg == "-input" )
+        else if( arg == "-input" )
         {
             output.load_population_data = true;
             output.population_path = std::filesystem::path( args.front());
             args.pop_front();
         }
-        if( arg == "-seed_id" )
+        else if( arg == "-seed_id" )
         {
             output.seed_dataset_id = std::stoi( args.front() );
             args.pop_front();
+        }
+        else if( arg == "-sector_id" )
+        {
+            output.sector_id = std::stoi( args.front() );
+            args.pop_front();
+        }
+        else
+        {
+            BOOST_LOG_TRIVIAL(error) << "Unsupported command-line argument: " << arg;
+            Usage( output );
         }
     }   
 
@@ -148,7 +158,7 @@ Options Parse_Command_Line( int argc, char* argv[] )
     output.ga_config.preservation_rate = output.preservation_rate;
     output.ga_config.selection_rate    = output.selection_rate;
     output.ga_config.random_vert_rate  = output.random_vert_rate;
-    output.ga_config.number_threads    = output.number_threads;
+    output.ga_config.number_threads    = output.ga_threads;
 
     return output;
 }
@@ -168,6 +178,9 @@ void Usage( const Options& options )
     sin << "   -start_point <lat> <lon> : Starting coordinate" << std::endl;
     sin << "   -end_point <lat> <lon> : Ending coordinate" << std::endl;
     sin << "Optional Arguments" << std::endl;
+    sin << "   -sector_id <int> : Run on only one sector." << std::endl;
+    sin << "       - Note: -1 means process all sectors." << std::endl;
+    sin << "       - Default: " << options.sector_id << std::endl;
     sin << "   -m <float> : Mutation Rate [0-1]" << std::endl;
     sin << "       - Default: " << options.mutation_rate << std::endl;
     sin << "   -p <float> : Preservation Rate [0-1]" << std::endl;

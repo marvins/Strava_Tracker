@@ -25,6 +25,16 @@ class Exit_Condition
          */
         virtual bool Check_Exit( double fitness );
 
+        /**
+         * @brief Get the Max Matches
+         */
+        size_t Get_Max_Matches() const;
+
+        /**
+         * @brief Get the EPS
+         */
+        double Get_EPS() const;
+
     private:
 
         /// Current Fitness Score
