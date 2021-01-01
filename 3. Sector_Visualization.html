@@ -1,0 +1,729 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sector Visualization &#8212; Strava Analysis</title>
+    
+  <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Strava Analysis</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro.html">
+   Strava Analysis
+  </a>
+ </li>
+</ul>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="Getting_Data.html">
+   Getting Data from Strava
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Getting_Data.html#tbd-automatically-use-strava-s-rest-api">
+   TBD:  Automatically use Strava’s Rest API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Genetic_Algorithm.html">
+   Average Route Generation using a Genetic Algorithm
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/3. Sector_Visualization.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+        <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/marvins/Strava_Tracker"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/marvins/Strava_Tracker/issues/new?title=Issue%20on%20page%20%2F3. Sector_Visualization.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/marvins/Strava_Tracker/master?urlpath=tree/report/3. Sector_Visualization.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#step-0-global-variables">
+   Step 0: Global variables
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#step-1-import-required-libraries-and-the-database">
+   Step 1: Import required libraries and the database
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#step-2-import-sector-data">
+   Step 2: Import Sector Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#plotting-data">
+   Plotting Data
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#control-widget">
+     Control Widget
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#map-widget">
+     Map Widget
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#plot-data">
+     Plot Data
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tying-it-all-together">
+   Tying it all together…
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   References
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="sector-visualization">
+<h1>Sector Visualization<a class="headerlink" href="#sector-visualization" title="Permalink to this headline">¶</a></h1>
+<p>In this example, we will parse the database and visualize each sector’s averaage times.</p>
+<div class="section" id="step-0-global-variables">
+<h2>Step 0: Global variables<a class="headerlink" href="#step-0-global-variables" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">database_path</span> <span class="o">=</span> <span class="s1">&#39;bike_data.db&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="step-1-import-required-libraries-and-the-database">
+<h2>Step 1: Import required libraries and the database<a class="headerlink" href="#step-1-import-required-libraries-and-the-database" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="kn">from</span> <span class="nn">ipyleaflet</span> <span class="kn">import</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Marker</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Polyline</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">plotly.subplots</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span>
+
+<span class="c1"># SQLAlchemy connectable </span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span> <span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">database_path</span> <span class="p">)</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">5</span><span class="n">f237d5e7d8a</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">ipyleaflet</span> <span class="kn">import</span> <span class="n">Map</span><span class="p">,</span> <span class="n">Marker</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Polyline</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;pandas&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="step-2-import-sector-data">
+<h2>Step 2: Import Sector Data<a class="headerlink" href="#step-2-import-sector-data" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sector_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span> <span class="s1">&#39;sector_list&#39;</span><span class="p">,</span><span class="n">conn</span><span class="p">)</span>
+<span class="n">centroid</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">num_points</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">sector_polygons</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">sector_polygons</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;centroid&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
+                          <span class="s1">&#39;polygon&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="n">counter</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="k">for</span> <span class="n">sector</span> <span class="ow">in</span> <span class="n">sector_list</span><span class="p">[</span><span class="s1">&#39;sector_id&#39;</span><span class="p">]:</span>
+    
+    <span class="n">sector_polygons</span><span class="p">[</span><span class="n">sector</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;centroid&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                               <span class="s1">&#39;polygon&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">sector_points</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span> <span class="n">sector</span><span class="p">,</span> <span class="n">conn</span> <span class="p">)</span>
+    
+    <span class="n">centroid</span> <span class="o">=</span> <span class="p">[</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sector_points</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sector_points</span><span class="p">),</span>
+                <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">sector_points</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">sector_points</span><span class="p">)]</span>
+    <span class="n">num_points</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">sector_points</span> <span class="p">)</span>
+    <span class="n">sector_polygons</span><span class="p">[</span><span class="n">sector</span><span class="p">][</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="p">[</span><span class="n">sector_points</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+                                            <span class="n">sector_points</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()]</span>
+    
+    <span class="n">color_code</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">rgb2hex</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;hsv&#39;</span><span class="p">)(</span> <span class="n">counter</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sector_list</span><span class="p">)</span> <span class="p">))</span>
+    <span class="n">polygon</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sector_points</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span> <span class="p">]</span>
+    <span class="n">sector_polygons</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">][</span><span class="s1">&#39;polygon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Polygon</span><span class="p">(</span> <span class="n">locations</span><span class="o">=</span><span class="n">polygon</span><span class="p">,</span>
+                                                        <span class="n">color</span><span class="o">=</span><span class="n">color_code</span><span class="p">,</span>
+                                                        <span class="n">fill_color</span><span class="o">=</span><span class="n">color_code</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">sector_polygons</span><span class="p">[</span><span class="n">sector</span><span class="p">][</span><span class="s1">&#39;polygon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Polygon</span><span class="p">(</span> <span class="n">locations</span><span class="o">=</span><span class="n">polygon</span><span class="p">,</span>
+                                                        <span class="n">color</span><span class="o">=</span><span class="n">color_code</span><span class="p">,</span>
+                                                        <span class="n">fill_color</span><span class="o">=</span><span class="n">color_code</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">counter</span> <span class="o">+=</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here is a handy visualization of the designated sectors.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">centroid_pt</span> <span class="o">=</span> <span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">num_points</span><span class="p">,</span> 
+               <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">num_points</span><span class="p">)</span>
+
+<span class="c1">#  Build Map Visualization    </span>
+<span class="n">sector_poly_map</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span> <span class="n">center</span><span class="o">=</span><span class="n">centroid_pt</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="n">sector_polygons</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">][</span><span class="s1">&#39;polygon&#39;</span><span class="p">]:</span>
+    <span class="n">sector_poly_map</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+    
+<span class="n">sector_poly_map</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;550px&quot;</span>    
+<span class="n">sector_poly_map</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "9b334ac8df55499bb6c67f92cf88cf89", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<p>For each sector, we need to construct tracks</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">Build_Segment</span><span class="p">(</span> <span class="n">conn</span><span class="p">,</span> <span class="n">point_list</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">,</span> <span class="n">sector_id</span> <span class="p">):</span>
+    
+    <span class="c1">#  Get a list of all points with that sector-id</span>
+    <span class="n">sql_query</span> <span class="o">=</span> <span class="s1">&#39;SELECT * FROM point_list WHERE (sector_id = </span><span class="se">\&#39;</span><span class="si">{}</span><span class="se">\&#39;</span><span class="s1">) and (dataset_id = </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">sector_id</span><span class="p">,</span> <span class="n">dataset_id</span> <span class="p">)</span>
+    <span class="n">points_in_sector</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span> <span class="n">sql_query</span><span class="p">,</span> <span class="n">conn</span> <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">points_in_sector</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">points_in_sector</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Construct the tracks</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#  For each segment, we need to create a track for each dataset</span>
+<span class="n">dataset_ids</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="s1">&#39;SELECT DISTINCT dataset_id FROM point_list&#39;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+
+<span class="c1">#  Load the entire list of points into one dataframe for quicker access</span>
+<span class="n">point_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span> <span class="s1">&#39;point_list&#39;</span><span class="p">,</span> <span class="n">conn</span> <span class="p">)</span>
+
+<span class="c1"># List of Polylines to view</span>
+<span class="n">sector_objects</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">sector_objects</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;route&#39;</span><span class="p">:</span> <span class="p">{},</span>
+                         <span class="s1">&#39;elevation_plot&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_ids</span><span class="p">[</span><span class="s1">&#39;dataset_id&#39;</span><span class="p">])):</span>
+        <span class="n">sector_objects</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[[],[]]</span> <span class="p">)</span>
+    
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sector_list</span><span class="p">[</span><span class="s1">&#39;sector_id&#39;</span><span class="p">]:</span>
+    <span class="n">sector_objects</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;route&#39;</span><span class="p">:</span> <span class="p">{},</span>
+                         <span class="s1">&#39;elevation_plot&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    
+<span class="n">global_polylines</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">dataset_ids</span><span class="p">[</span><span class="s1">&#39;dataset_id&#39;</span><span class="p">]:</span>
+    <span class="n">global_polylines</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    
+<span class="c1">#  Iterate over points    </span>
+<span class="k">for</span> <span class="n">sector_id</span> <span class="ow">in</span> <span class="n">sector_list</span><span class="p">[</span><span class="s1">&#39;sector_id&#39;</span><span class="p">]:</span>
+    
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_ids</span><span class="p">[</span><span class="s1">&#39;dataset_id&#39;</span><span class="p">])):</span>
+        <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_id</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[[],[]]</span> <span class="p">)</span>
+    
+    <span class="c1">#  For each dataset</span>
+    <span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">dataset_ids</span><span class="p">[</span><span class="s1">&#39;dataset_id&#39;</span><span class="p">]:</span>
+        
+        <span class="c1">#  Create a full track of the segment</span>
+        <span class="n">sql_query</span> <span class="o">=</span> <span class="s1">&#39;SELECT * FROM point_list WHERE (sector_id = </span><span class="se">\&#39;</span><span class="si">{}</span><span class="se">\&#39;</span><span class="s1">) and (dataset_id = </span><span class="si">{}</span><span class="s1">) ORDER BY timestamp&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">sector_id</span><span class="p">,</span> <span class="n">dataset_id</span> <span class="p">)</span>
+        <span class="n">points_in_sector</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span> <span class="n">sql_query</span><span class="p">,</span> <span class="n">conn</span> <span class="p">)</span>
+        
+        <span class="c1">#  from the point list, we can compute time spent in sector</span>
+        <span class="n">points_in_sector</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">points_in_sector</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">])</span>
+        <span class="n">time_in_sector</span> <span class="o">=</span> <span class="n">points_in_sector</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">points_in_sector</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        
+        <span class="c1">#  We can build a linked-list of points</span>
+        <span class="n">distance_sector</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sector_polyline</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_id</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points_in_sector</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+            
+            <span class="c1">#  Update the Polylines</span>
+            <span class="n">global_polylines</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="n">sector_polyline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">point</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+            
+            <span class="c1">#  Elevation Information</span>
+            <span class="n">sector_objects</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="n">dataset_start</span> <span class="p">)</span>
+            <span class="n">sector_objects</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">point</span><span class="o">.</span><span class="n">elevation</span> <span class="p">)</span>
+            <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_id</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="n">sector_start</span> <span class="p">)</span>
+            <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_id</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">point</span><span class="o">.</span><span class="n">elevation</span> <span class="p">)</span>
+            
+        <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_id</span><span class="p">][</span><span class="s1">&#39;route&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">Polyline</span><span class="p">(</span> <span class="n">locations</span><span class="o">=</span><span class="n">sector_polyline</span><span class="p">,</span>
+                                                                   <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+                                                                   <span class="n">fill</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+            
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sector: </span><span class="si">{}</span><span class="s1">, Dataset: </span><span class="si">{}</span><span class="s1">, Distance: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">sector_id</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">,</span> <span class="n">distance_sector</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="c1">#  We can also find the distance run through sector</span>
+        <span class="c1">#distance_in_sector</span>
+        
+<span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">dataset_ids</span><span class="p">[</span><span class="s1">&#39;dataset_id&#39;</span><span class="p">]:</span>
+    <span class="n">sector_objects</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">][</span><span class="s1">&#39;route&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">Polyline</span><span class="p">(</span> <span class="n">locations</span><span class="o">=</span><span class="n">global_polylines</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">OperationalError</span><span class="g g-Whitespace">                          </span>Traceback (most recent call last)
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/base.py</span> in <span class="ni">_execute_context</span><span class="nt">(self, dialect, constructor, statement, parameters, *args)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1265</span>                 <span class="k">if</span> <span class="ow">not</span> <span class="n">evt_handled</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1266</span>                     <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span><span class="o">.</span><span class="n">do_execute_no_params</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1267</span>                         <span class="n">cursor</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">context</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/default.py</span> in <span class="ni">do_execute_no_params</span><span class="nt">(self, cursor, statement, context)</span>
+<span class="g g-Whitespace">    </span><span class="mi">595</span>     <span class="k">def</span> <span class="nf">do_execute_no_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">596</span>         <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">597</span> 
+
+<span class="ne">OperationalError</span>: no such column: dataset_id
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">OperationalError</span><span class="g g-Whitespace">                          </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">6</span><span class="o">-</span><span class="n">aa9837ec5364</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1">#  For each segment, we need to create a track for each dataset</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">dataset_ids</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="s1">&#39;SELECT DISTINCT dataset_id FROM point_list&#39;</span><span class="p">,</span> <span class="n">conn</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> 
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1">#  Load the entire list of points into one dataframe for quicker access</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">point_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_table</span><span class="p">(</span> <span class="s1">&#39;point_list&#39;</span><span class="p">,</span> <span class="n">conn</span> <span class="p">)</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/pandas/io/sql.py</span> in <span class="ni">read_sql_query</span><span class="nt">(sql, con, index_col, coerce_float, params, parse_dates, chunksize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">375</span>     <span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">376</span><span class="sd">     pandas_sql = pandasSQL_builder(con)</span>
+<span class="ne">--&gt; </span><span class="mi">377</span><span class="sd">     return pandas_sql.read_query(</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span><span class="sd">         sql,</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span><span class="sd">         index_col=index_col,</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/pandas/io/sql.py</span> in <span class="ni">read_query</span><span class="nt">(self, sql, index_col, coerce_float, parse_dates, params, chunksize)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1293</span><span class="sd">         args = _convert_params(sql, params)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1294</span><span class="sd"> </span>
+<span class="ne">-&gt; </span><span class="mi">1295</span><span class="sd">         result = self.execute(*args)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1296</span><span class="sd">         columns = result.keys()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1297</span><span class="sd"> </span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/pandas/io/sql.py</span> in <span class="ni">execute</span><span class="nt">(self, *args, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1159</span><span class="sd">     def execute(self, *args, **kwargs):</span>
+<span class="g g-Whitespace">   </span><span class="mi">1160</span><span class="sd">         &quot;&quot;&quot;</span><span class="n">Simple</span> <span class="n">passthrough</span> <span class="n">to</span> <span class="n">SQLAlchemy</span> <span class="n">connectable</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1161</span><span class="s2">         return self.connectable.execution_options(no_parameters=True).execute(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1162</span><span class="s2">             *args, **kwargs</span>
+<span class="g g-Whitespace">   </span><span class="mi">1163</span><span class="s2">         )</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/base.py</span> in <span class="ni">execute</span><span class="nt">(self, object_, *multiparams, **params)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1001</span><span class="s2">         &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">   </span><span class="mi">1002</span>         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">object_</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">string_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+<span class="ne">-&gt; </span><span class="mi">1003</span>             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_text</span><span class="p">(</span><span class="n">object_</span><span class="p">,</span> <span class="n">multiparams</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1004</span>         <span class="k">try</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1005</span>             <span class="n">meth</span> <span class="o">=</span> <span class="n">object_</span><span class="o">.</span><span class="n">_execute_on_connection</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/base.py</span> in <span class="ni">_execute_text</span><span class="nt">(self, statement, multiparams, params)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1170</span>         <span class="n">dialect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span>
+<span class="g g-Whitespace">   </span><span class="mi">1171</span>         <span class="n">parameters</span> <span class="o">=</span> <span class="n">_distill_params</span><span class="p">(</span><span class="n">multiparams</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1172</span>         <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_context</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1173</span>             <span class="n">dialect</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1174</span>             <span class="n">dialect</span><span class="o">.</span><span class="n">execution_ctx_cls</span><span class="o">.</span><span class="n">_init_statement</span><span class="p">,</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/base.py</span> in <span class="ni">_execute_context</span><span class="nt">(self, dialect, constructor, statement, parameters, *args)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1314</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1315</span>         <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1316</span>             <span class="bp">self</span><span class="o">.</span><span class="n">_handle_dbapi_exception</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1317</span>                 <span class="n">e</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">context</span>
+<span class="g g-Whitespace">   </span><span class="mi">1318</span>             <span class="p">)</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/base.py</span> in <span class="ni">_handle_dbapi_exception</span><span class="nt">(self, e, statement, parameters, cursor, context)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1508</span>                 <span class="n">util</span><span class="o">.</span><span class="n">raise_</span><span class="p">(</span><span class="n">newraise</span><span class="p">,</span> <span class="n">with_traceback</span><span class="o">=</span><span class="n">exc_info</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">from_</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1509</span>             <span class="k">elif</span> <span class="n">should_wrap</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1510</span>                 <span class="n">util</span><span class="o">.</span><span class="n">raise_</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1511</span>                     <span class="n">sqlalchemy_exception</span><span class="p">,</span> <span class="n">with_traceback</span><span class="o">=</span><span class="n">exc_info</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">from_</span><span class="o">=</span><span class="n">e</span>
+<span class="g g-Whitespace">   </span><span class="mi">1512</span>                 <span class="p">)</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/util/compat.py</span> in <span class="ni">raise_</span><span class="nt">(***failed resolving arguments***)</span>
+<span class="g g-Whitespace">    </span><span class="mi">180</span> 
+<span class="g g-Whitespace">    </span><span class="mi">181</span>         <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">182</span>             <span class="k">raise</span> <span class="n">exception</span>
+<span class="g g-Whitespace">    </span><span class="mi">183</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">184</span>             <span class="c1"># credit to</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/base.py</span> in <span class="ni">_execute_context</span><span class="nt">(self, dialect, constructor, statement, parameters, *args)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1264</span>                             <span class="k">break</span>
+<span class="g g-Whitespace">   </span><span class="mi">1265</span>                 <span class="k">if</span> <span class="ow">not</span> <span class="n">evt_handled</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1266</span>                     <span class="bp">self</span><span class="o">.</span><span class="n">dialect</span><span class="o">.</span><span class="n">do_execute_no_params</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1267</span>                         <span class="n">cursor</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">context</span>
+<span class="g g-Whitespace">   </span><span class="mi">1268</span>                     <span class="p">)</span>
+
+<span class="nn">~/.local/lib/python3.8/site-packages/sqlalchemy/engine/default.py</span> in <span class="ni">do_execute_no_params</span><span class="nt">(self, cursor, statement, context)</span>
+<span class="g g-Whitespace">    </span><span class="mi">594</span> 
+<span class="g g-Whitespace">    </span><span class="mi">595</span>     <span class="k">def</span> <span class="nf">do_execute_no_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">596</span>         <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">statement</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">597</span> 
+<span class="g g-Whitespace">    </span><span class="mi">598</span>     <span class="k">def</span> <span class="nf">is_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">cursor</span><span class="p">):</span>
+
+<span class="ne">OperationalError</span>: (sqlite3.OperationalError) no such column: dataset_id
+<span class="p">[</span><span class="n">SQL</span><span class="p">:</span> <span class="n">SELECT</span> <span class="n">DISTINCT</span> <span class="n">dataset_id</span> <span class="n">FROM</span> <span class="n">point_list</span><span class="p">]</span>
+<span class="p">(</span><span class="n">Background</span> <span class="n">on</span> <span class="n">this</span> <span class="n">error</span> <span class="n">at</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">sqlalche</span><span class="o">.</span><span class="n">me</span><span class="o">/</span><span class="n">e</span><span class="o">/</span><span class="mi">13</span><span class="o">/</span><span class="n">e3q8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="plotting-data">
+<h2>Plotting Data<a class="headerlink" href="#plotting-data" title="Permalink to this headline">¶</a></h2>
+<p>It would be nice to visualize our map alongside some useful plots.</p>
+<div class="section" id="control-widget">
+<h3>Control Widget<a class="headerlink" href="#control-widget" title="Permalink to this headline">¶</a></h3>
+<p>Let’s make a widget to control which sector we want to view.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+
+<span class="n">sector_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sector_list</span><span class="p">[</span><span class="s1">&#39;sector_id&#39;</span><span class="p">]]</span>
+<span class="n">sector_names</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;all&#39;</span> <span class="p">]</span> <span class="o">+</span> <span class="n">sector_names</span>
+<span class="n">sector_select_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span> <span class="n">options</span><span class="o">=</span><span class="n">sector_names</span><span class="p">,</span>
+                                         <span class="n">value</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+                                         <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Sector:&#39;</span><span class="p">,</span>
+                                         <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+<span class="k">def</span> <span class="nf">on_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;change&#39;</span> <span class="ow">and</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+        
+        <span class="c1">#  Remove Routes</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Old Sector: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">sector_objects</span><span class="p">[</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">]][</span><span class="s1">&#39;route&#39;</span><span class="p">]:</span>
+            <span class="n">sector_map</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span> <span class="n">sector_objects</span><span class="p">[</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">]][</span><span class="s1">&#39;route&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">])</span>
+        
+        <span class="c1">#  Remove Widgets</span>
+        <span class="k">for</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="n">sector_polygons</span><span class="p">[</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">]][</span><span class="s1">&#39;polygon&#39;</span><span class="p">]:</span>
+            <span class="n">sector_map</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+        
+        <span class="c1">#  Add Routes</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;New Sector: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">sector_objects</span><span class="p">[</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]][</span><span class="s1">&#39;route&#39;</span><span class="p">]:</span>
+            <span class="n">sector_map</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span> <span class="n">sector_objects</span><span class="p">[</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]][</span><span class="s1">&#39;route&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">])</span>
+            
+        <span class="k">for</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="n">sector_polygons</span><span class="p">[</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]][</span><span class="s1">&#39;polygon&#39;</span><span class="p">]:</span>
+            <span class="n">sector_map</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+
+<span class="n">sector_select_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">on_change</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="map-widget">
+<h3>Map Widget<a class="headerlink" href="#map-widget" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#  Build Map Visualization    </span>
+<span class="n">sector_map</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span> <span class="n">center</span><span class="o">=</span><span class="n">centroid_pt</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_select_widget</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s1">&#39;route&#39;</span><span class="p">]:</span>
+    <span class="n">sector_map</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span> <span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_select_widget</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s1">&#39;route&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">]</span> <span class="p">)</span>
+    
+<span class="k">for</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="n">sector_polygons</span><span class="p">[</span><span class="n">sector_select_widget</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s1">&#39;polygon&#39;</span><span class="p">]:</span>
+            <span class="n">sector_map</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>    
+<span class="c1">#sector_map.layout.height=&quot;400px&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="plot-data">
+<h3>Plot Data<a class="headerlink" href="#plot-data" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation_profile_fig</span> <span class="o">=</span> <span class="n">plotly</span><span class="o">.</span><span class="n">graph_objects</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+<span class="n">elevation_profile_fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span> <span class="n">title</span><span class="o">=</span><span class="p">{</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s2">&quot;Elevation Profile&quot;</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="c1">#  For each Dataset,</span>
+<span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="n">dataset_ids</span><span class="p">[</span><span class="s1">&#39;dataset_id&#39;</span><span class="p">]:</span>
+    <span class="n">elevation_profile_fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span> <span class="n">plotly</span><span class="o">.</span><span class="n">graph_objects</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span> <span class="n">x</span><span class="o">=</span><span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_select_widget</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
+                                                            <span class="n">y</span><span class="o">=</span><span class="n">sector_objects</span><span class="p">[</span><span class="n">sector_select_widget</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s1">&#39;elevation_plot&#39;</span><span class="p">][</span><span class="n">dataset_id</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                                            <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>
+                                                            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="tying-it-all-together">
+<h2>Tying it all together…<a class="headerlink" href="#tying-it-all-together" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sector_select_widget</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sector_map</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation_profile_fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span> <span class="n">config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="s1">&#39;scrollZoom&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Vincenty Formula Code: https://nathanrooy.github.io/posts/2016-12-18/vincenty-formula-with-python/</p></li>
+</ul>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Marvin Smith<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+  </body>
+</html>
