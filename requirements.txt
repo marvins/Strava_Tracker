@@ -1,9 +1,3 @@
-pandas
-gpxpy
-ipywidgets
-shapely
-sqlalchemy
-ipyleaflet
 jupyter-book
 matplotlib
 numpy
