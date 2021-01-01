@@ -117,6 +117,7 @@ class Genetic_Algorithm
                 m_aggregator.Report_Timing( "Mutation", mutation_time );
 
                 // Update Fitness Scores
+                BOOST_LOG_TRIVIAL(debug) << "Starting Fitness Computations. Threads: " << m_config.number_threads;
                 auto start_fitness = std::chrono::steady_clock::now();
                 {
                     Thread_Pool pool( m_config.number_threads );

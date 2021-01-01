@@ -17,7 +17,7 @@ ITERATIONS=1000
 POP_SIZE=1000
 
 MIN_WP=8
-MAX_WP=14
+MAX_WP=30
 
 MUT_RATE='1'
 SRATE='0.3'
@@ -27,9 +27,11 @@ SEED_ID='2'
 
 MAX_ERR='40'
 
-SECTOR_THREADS='9'
-GA_THREADS='4'
+GA_THREADS='10'
+
+SECTOR='2'
 
 # Run Route Finder
 ./cpp/release/bin/route_finder -d ./bike_data.db -i ${ITERATIONS} -pop ${POP_SIZE} -minw ${MIN_WP} -maxw ${MAX_WP} \
-                               -gt ${GA_THREADS} -m ${MUT_RATE} -p ${PRATE} -s ${SRATE} -seed_id ${SEED_ID} -err ${MAX_ERR}
+                               -gt ${GA_THREADS} -m ${MUT_RATE} -p ${PRATE} -s ${SRATE} -seed_id ${SEED_ID} -err ${MAX_ERR} \
+                               -sector_id 2
