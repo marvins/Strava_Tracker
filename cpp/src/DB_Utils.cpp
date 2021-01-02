@@ -168,7 +168,7 @@ std::map<std::string,std::tuple<DB_Point,DB_Point>>  Load_Sector_Data( sqlite3 *
     // Step 1: Load the list of sector names
     // Create Statement
     std::vector<std::string> sector_list;
-    std::string sql = "SELECT sector_id FROM sector_list";
+    std::string sql = "SELECT sectorId FROM sector_list";
     char* zErrMsg = 0;
 
     // Make SQL Statement
@@ -216,7 +216,7 @@ std::vector<DB_Point> Load_Point_List( sqlite3*           db,
     std::string sql = "SELECT * FROM point_list";
     if( !sector_id.empty() )
     {
-        sql += " WHERE sectorID=\"" + sector_id + "\"";
+        sql += " WHERE sectorId=\"" + sector_id + "\"";
         if( dataset_id >= 0 )
         {
             sql += " AND datasetId=\"" + std::to_string(dataset_id) + "\"";
