@@ -27,11 +27,11 @@ SEED_ID='2'
 
 MAX_ERR='40'
 
-GA_THREADS='10'
+GA_THREADS='2'
 
-SECTOR='2'
+SECTOR='-1'
 
 # Run Route Finder
 ./cpp/release/bin/route_finder -d ./bike_data.db -i ${ITERATIONS} -pop ${POP_SIZE} -minw ${MIN_WP} -maxw ${MAX_WP} \
                                -gt ${GA_THREADS} -m ${MUT_RATE} -p ${PRATE} -s ${SRATE} -seed_id ${SEED_ID} -err ${MAX_ERR} \
-                               -sector_id 2
+                               -sector_id ${SECTOR}

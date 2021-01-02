@@ -1,3 +1,8 @@
 jupyter-book
 matplotlib
 numpy
+gpxpy
+shapely
+pyproj
+geopy
+plotly
