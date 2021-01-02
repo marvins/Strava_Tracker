@@ -1,18 +1,18 @@
-##  Getting Data from Strava
+#  Getting Data from Strava
 
 For this exercize, I'm using GPX data from Strava.  Strava's free account allows you to download/export GPX-formatted data.
 
-### Step 1: Log into Strava's Website
+## Step 1: Log into Strava's Website
 
 This is self-explanatory
 
-### Step 2: Export Strava Datasets
+## Step 2: Export Strava Datasets
 
 For each exercise activity you do, you can export it's GPX-formatted data as shown in the screenshot below...
 
 ![export_strava](images/strava_export.png)
 
-### Overview of GPX Data
+## Overview of GPX Data
 
 GPX data is in XML format.  It's a highly descriptive, easily parsible format. 
 
