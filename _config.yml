@@ -10,6 +10,10 @@ logo: logo.png
 execute:
   execute_notebooks: force
 
+execute:
+  exclude_patterns:
+    - 'Importing_GPX_Data.ipynb'
+
 # Define the name of the latex output file for PDF builds
 latex:
   latex_documents:
