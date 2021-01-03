@@ -13,6 +13,7 @@ execute:
 execute:
   exclude_patterns:
     - 'Importing_GPX_Data.ipynb'
+    - 'Visualize_GA_Performance.ipynb'
 
 # Define the name of the latex output file for PDF builds
 latex:

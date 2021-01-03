@@ -7,3 +7,4 @@
     - file: Getting_Data.md
     - file: Importing_GPX_Data.ipynb
     - file: Genetic_Algorithm.ipynb
+    - file: Visualize_GA_Performance.ipynb
