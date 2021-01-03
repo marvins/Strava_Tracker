@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Average Route Generation using a Genetic Algorithm &#8212; Strava Analysis</title>
+    <title>Average Route Generation using Genetic Algorithms &#8212; Strava Analysis</title>
     
   <link rel="stylesheet" href="_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -57,6 +57,7 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GA Visualization" href="Visualize_GA_Performance.html" />
     <link rel="prev" title="Importing and Parsing Strava Datasets" href="Importing_GPX_Data.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -107,7 +108,12 @@
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Average Route Generation using a Genetic Algorithm
+   Average Route Generation using Genetic Algorithms
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="Visualize_GA_Performance.html">
+   GA Visualization
   </a>
  </li>
 </ul>
@@ -226,9 +232,46 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#edge-cases">
-   Edge Cases
+  <a class="reference internal nav-link" href="#genetic-algorithm-overview">
+   Genetic Algorithm Overview
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#phenotype-construction">
+     Phenotype Construction
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#generate-initial-population">
+     Generate Initial Population
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#preservation">
+     Preservation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#selection">
+     Selection
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#crossover">
+     Crossover
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mutation">
+     Mutation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#process-duplicates">
+     Process Duplicates
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -241,9 +284,10 @@
         
               <div>
                 
-  <div class="section" id="average-route-generation-using-a-genetic-algorithm">
-<h1>Average Route Generation using a Genetic Algorithm<a class="headerlink" href="#average-route-generation-using-a-genetic-algorithm" title="Permalink to this headline">¶</a></h1>
-<p>This outlines the various GA steps used to construct the route.</p>
+  <div class="section" id="average-route-generation-using-genetic-algorithms">
+<h1>Average Route Generation using Genetic Algorithms<a class="headerlink" href="#average-route-generation-using-genetic-algorithms" title="Permalink to this headline">¶</a></h1>
+<p>In order to compare different routes, we need to compute an “average” route, then compare every dataset against it.</p>
+<p>To do this, I have created a C++ genetic algorithm which seeks to find the “optimal” route through a cloud of GPS coordinates.</p>
 <div class="section" id="fitness-function">
 <h2>Fitness Function<a class="headerlink" href="#fitness-function" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -252,6 +296,7 @@
 <li><p>Vertices should be in the tightest clusters of coordinates.</p>
 <ul>
 <li><p>Vertices should be within the average of multiple routes.</p></li>
+<li><p>i.e. The route should be within the polygon.</p></li>
 </ul>
 </li>
 <li><p>The route should be as short as possible to decrease loopbacks</p></li>
@@ -279,33 +324,42 @@
 </ul>
 <div class="math notranslate nohighlight">
 \[
-    \textrm{F} = \sum_{i=1}^{N_s} \left| \bar{S} \right| \cdot \left( \sum_{i=1}^{N_p} d( P, \bar{S} ) \right)
+    \textrm{F} = L_{\bar{S}} \cdot \sum_{i=1}^{N_\bar{S}} \min_{\forall p \in P} \left( d(p,S_i) \right)
 \]</div>
 <p>where</p>
 <ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(P\)</span> is the set of points in the point cloud.</p></li>
 <li><p><span class="math notranslate nohighlight">\(N_{\bar{S}}\)</span> is the number of line segments</p></li>
-<li><p><span class="math notranslate nohighlight">\(N_p\)</span> is the number of points closest to the line segment</p></li>
-<li><p><span class="math notranslate nohighlight">\(d( P, \bar{S})\)</span> is the distance function from point <span class="math notranslate nohighlight">\(P\)</span> to line-segment <span class="math notranslate nohighlight">\(\bar{S}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(d( P, \bar{S})\)</span> is the distance function from point <span class="math notranslate nohighlight">\(P\)</span> to line-segment <span class="math notranslate nohighlight">\(\bar{S}_i\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(L_{\bar{S}}\)</span> is the length of line-segment <span class="math notranslate nohighlight">\(\bar{S}\)</span></p></li>
 </ul>
 </div>
 </div>
-<div class="section" id="edge-cases">
-<h2>Edge Cases<a class="headerlink" href="#edge-cases" title="Permalink to this headline">¶</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### Loop Backs</span>
-
-<span class="o">![</span>loop_back<span class="o">](</span>images/loop_back.png<span class="o">)</span>
-</pre></div>
+<div class="section" id="genetic-algorithm-overview">
+<h2>Genetic Algorithm Overview<a class="headerlink" href="#genetic-algorithm-overview" title="Permalink to this headline">¶</a></h2>
+<p>Genetic Algorithms work by taking a large population (sample solutions) and iteratively tweaking them until a best solution starts to emerge.  The process can generally be described with the following stages.</p>
+<div class="section" id="phenotype-construction">
+<h3>Phenotype Construction<a class="headerlink" href="#phenotype-construction" title="Permalink to this headline">¶</a></h3>
+<p>Each Phenotype is constructed as a chain of vertices.  Each vertex contains and X and Y component.  For a Phenotype of N waypoints, it would be constructed as</p>
+<p><img alt="phenotype|40%" src="_images/phenotype.png" /></p>
 </div>
+<div class="section" id="generate-initial-population">
+<h3>Generate Initial Population<a class="headerlink" href="#generate-initial-population" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/bin/bash: -c: line 0: syntax error near unexpected token `images/loop_back.png&#39;
-/bin/bash: -c: line 0: `[loop_back](images/loop_back.png)&#39;
-</pre></div>
+<div class="section" id="preservation">
+<h3>Preservation<a class="headerlink" href="#preservation" title="Permalink to this headline">¶</a></h3>
 </div>
+<div class="section" id="selection">
+<h3>Selection<a class="headerlink" href="#selection" title="Permalink to this headline">¶</a></h3>
 </div>
+<div class="section" id="crossover">
+<h3>Crossover<a class="headerlink" href="#crossover" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="mutation">
+<h3>Mutation<a class="headerlink" href="#mutation" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="process-duplicates">
+<h3>Process Duplicates<a class="headerlink" href="#process-duplicates" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 </div>
@@ -339,6 +393,7 @@
     <div class='prev-next-bottom'>
         
     <a class='left-prev' id="prev-link" href="Importing_GPX_Data.html" title="previous page">Importing and Parsing Strava Datasets</a>
+    <a class='right-next' id="next-link" href="Visualize_GA_Performance.html" title="next page">GA Visualization</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">
