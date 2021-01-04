@@ -342,6 +342,9 @@
 <h3>Phenotype Construction<a class="headerlink" href="#phenotype-construction" title="Permalink to this headline">¶</a></h3>
 <p>Each Phenotype is constructed as a chain of vertices.  Each vertex contains and X and Y component.  For a Phenotype of N waypoints, it would be constructed as</p>
 <p><img alt="phenotype|40%" src="_images/phenotype.png" /></p>
+<p>Easting and Northing values for Denver are quite large, meaning we need to reduce the quantity of data.</p>
+<p>Example Values: 511949.8372, 438352.72298</p>
+<p>To do this, we compute the range of easting and northing values using all coordinates.</p>
 </div>
 <div class="section" id="generate-initial-population">
 <h3>Generate Initial Population<a class="headerlink" href="#generate-initial-population" title="Permalink to this headline">¶</a></h3>
